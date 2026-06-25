@@ -65,11 +65,11 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 #board{position:absolute;transform-origin:0 0;will-change:transform}
 
 #string-svg{
-  position:absolute;top:0;left:0;width:680px;height:1980px;
+  position:absolute;top:0;left:0;
   pointer-events:none;z-index:5;overflow:visible;
 }
 
-#memo-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20}
+#memo-layer{position:absolute;top:0;left:0;pointer-events:none;z-index:20}
 
 .memo-card{position:absolute;pointer-events:auto;user-select:none;touch-action:none}
 .memo-pin{
@@ -78,11 +78,11 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
   box-shadow:0 2px 5px rgba(0,0,0,0.7);z-index:2;
 }
 .memo-paper{
-  background:rgba(242,238,224,0.92);padding:10px 10px 20px;position:relative;
-  font-family:'Courier New',monospace;font-size:11px;line-height:1.7;color:#1a1814;
+  background:rgba(242,238,224,0.92);padding:3px 5px 10px;position:relative;
+  font-family:'Courier New',monospace;font-size:5px;line-height:1.6;color:#1a1814;
   word-break:break-all;white-space:pre-wrap;box-shadow:2px 3px 10px rgba(0,0,0,0.5);
 }
-.memo-author{position:absolute;bottom:4px;right:7px;font-size:8px;color:#888;letter-spacing:1px}
+.memo-author{position:absolute;bottom:2px;right:5px;font-size:5px;color:#888;letter-spacing:1px}
 .memo-del{
   position:absolute;top:3px;right:4px;
   background:none;border:none;color:#aaa;font-size:13px;
@@ -91,8 +91,8 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 .memo-card:hover .memo-del{display:block}
 .memo-edit-area{
   width:100%;background:transparent;border:none;outline:none;
-  font-family:'Courier New',monospace;font-size:11px;line-height:1.7;color:#1a1814;
-  resize:none;min-height:40px;
+  font-family:'Courier New',monospace;font-size:5px;line-height:1.6;color:#1a1814;
+  resize:none;min-height:16px;
 }
 
 #compose{
@@ -177,22 +177,27 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 <text x="340" y="38" text-anchor="middle" style="font-size:15px;letter-spacing:3px">매키탄 호텔</text>
 <text x="340" y="56" text-anchor="middle" style="font-size:9px;fill:#787468;font-family:'Courier New',monospace;letter-spacing:5px">MAEKITAN HOTEL · CROSS SECTION</text>
 <line x1="60" y1="64" x2="620" y2="64" stroke="#e8e4d9" stroke-width="0.3" opacity="0.4"/>
-<line x1="60" y1="68" x2="60" y2="1610" stroke="#e8e4d9" stroke-width="0.5"/>
-<line x1="620" y1="68" x2="620" y2="1610" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="60" y1="68" x2="60" y2="1510" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="620" y1="68" x2="620" y2="1510" stroke="#e8e4d9" stroke-width="0.5"/>
 <polygon points="220,90 340,68 460,90" fill="none" stroke="#e8e4d9" stroke-width="0.8"/>
-<rect x="260" y="90" width="160" height="55" fill="none" stroke="#e8e4d9" stroke-width="0.8"/>
-<rect x="305" y="100" width="30" height="20" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
-<line x1="320" y1="100" x2="320" y2="120" stroke="#e8e4d9" stroke-width="0.3"/><line x1="305" y1="110" x2="335" y2="110" stroke="#e8e4d9" stroke-width="0.3"/>
-<rect x="270" y="118" width="16" height="12" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
-<polygon points="270,118 278,112 286,118" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
-<rect x="294" y="120" width="12" height="10" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
-<polygon points="294,120 300,115 306,120" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
-<rect x="355" y="118" width="16" height="12" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
-<polygon points="355,118 363,112 371,118" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
-<rect x="378" y="120" width="14" height="10" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
-<polygon points="378,120 385,115 392,120" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
-<text x="340" y="137" text-anchor="middle" class="sl">타이니 타운</text>
-<text x="266" y="154" class="dl">· 비밀의 장소</text>
+<line x1="220" y1="90" x2="60" y2="119" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="460" y1="90" x2="620" y2="119" stroke="#e8e4d9" stroke-width="0.5"/>
+<circle cx="340" cy="80" r="7" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="340" y1="73" x2="340" y2="87" stroke="#e8e4d9" stroke-width="0.3"/><line x1="333" y1="80" x2="347" y2="80" stroke="#e8e4d9" stroke-width="0.3"/>
+<line x1="120" y1="118" x2="560" y2="118" stroke="#e8e4d9" stroke-width="0.7"/>
+<line x1="200" y1="118" x2="200" y2="124" stroke="#e8e4d9" stroke-width="0.4"/><line x1="480" y1="118" x2="480" y2="124" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="308" y="124" width="28" height="18" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<path d="M308 124 Q322 119 336 124" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="322" y1="119" x2="322" y2="142" stroke="#e8e4d9" stroke-width="0.3"/>
+<rect x="108" y="126" width="22" height="16" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="132" y="130" width="16" height="12" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="498" y="126" width="22" height="16" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="520" y="130" width="16" height="12" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="280" y="141" width="32" height="6" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="230" y1="118" x2="230" y2="128" stroke="#e8e4d9" stroke-width="0.3"/>
+<ellipse cx="230" cy="133" rx="5" ry="4" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="340" y="108" text-anchor="middle" class="sl">타이니 타운</text>
+<text x="440" y="144" class="dl">· 다락방</text>
 <text x="66" y="120" class="fl">8</text>
 <line x1="60" y1="148" x2="620" y2="148" stroke="#e8e4d9" stroke-width="0.5"/>
 <text x="340" y="166" text-anchor="middle" class="sl">킹 제임스 요양병원</text>
@@ -362,7 +367,7 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 <path d="M256 1116 Q256 1096 270 1096 Q284 1096 284 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
 <path d="M296 1116 Q296 1096 310 1096 Q324 1096 324 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
 <path d="M336 1116 Q336 1096 350 1096 Q364 1096 364 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
-<path d="M376 1116 Q376 1096 390 1096 Q404 1096 390 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<path d="M376 1116 Q376 1096 390 1096 Q404 1096 404 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
 <line x1="256" y1="1116" x2="256" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="284" y1="1116" x2="284" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="296" y1="1116" x2="296" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="324" y1="1116" x2="324" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="336" y1="1116" x2="336" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="364" y1="1116" x2="364" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="376" y1="1116" x2="376" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="404" y1="1116" x2="404" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/>
 <line x1="256" y1="1156" x2="440" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/>
 <rect x="274" y="1166" width="80" height="60" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
@@ -388,7 +393,7 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 <text x="66" y="1080" class="fl">2</text>
 <line x1="60" y1="1248" x2="620" y2="1248" stroke="#e8e4d9" stroke-width="0.5"/>
 <text x="340" y="1266" text-anchor="middle" class="sl">입구</text>
-<path d="M310 1290 L310 1248 Q310 1235 340 1235 Q370 1235 370 1248 L370 1290" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
+<path d="M310 1290 L310 1266 Q310 1256 340 1256 Q370 1256 370 1266 L370 1290" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
 <line x1="340" y1="1265" x2="340" y2="1320" stroke="#e8e4d9" stroke-width="0.4"/>
 <rect x="265" y="1275" width="36" height="38" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
 <rect x="379" y="1275" width="36" height="38" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
@@ -416,8 +421,8 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 <text x="340" y="1532" text-anchor="middle" style="font-size:8px;fill:#484440;font-family:'Courier New',monospace;letter-spacing:3px">SLEEP NO MORE · SEOUL</text>
     </svg>
     <svg id="string-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="memo-layer"></div>
   </div>
-  <div id="memo-layer"></div>
 </div>
 
 <div id="compose">
@@ -438,12 +443,27 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const CONFIGURED = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
 if (!CONFIGURED) document.getElementById('config-banner').style.display = 'block';
 
+// ── 배경 설정 ── 배경 교체 시 이 블록만 수정하면 됨
+const SVG_W         = 680;   // 배경 SVG 가로 크기
+const SVG_H         = 1980;  // 배경 SVG 세로 크기
+const SVG_CAPTURE_H = 1560;  // 캡처 크롭 높이 (하단 여백 제외한 콘텐츠 끝 y좌표)
+const FLOORS = [              // 층별 메모 랜덤 배치 범위 (SVG y좌표 기준)
+  {top:68,  bot:148 },
+  {top:148, bot:288 },
+  {top:338, bot:468 },
+  {top:468, bot:618 },
+  {top:618, bot:868 },
+  {top:868, bot:1048},
+  {top:1048,bot:1248},
+  {top:1248,bot:1328},
+  {top:1328,bot:1510},
+];
+// ── 배경 설정 끝 ──
+
 const PIN_COLORS  = ['#c0392b','#2980b9','#27ae60','#e67e22','#8e44ad','#e91e8c'];
-const SVG_W       = 680;
-const SVG_H       = 1980;
 const THREE_HOURS = 3 * 60 * 60 * 1000;
-const MEMO_W      = 140;
-const MEMO_H      = 105;
+const MEMO_W_SVG  = 90;  // 메모지 가로 (SVG 좌표계 기준)
+const MEMO_H_SVG  = 70;  // 메모지 세로 (SVG 좌표계 기준)
 
 let user         = null;
 let roomCode     = '';
@@ -457,6 +477,10 @@ const boardWrap = document.getElementById('board-wrap');
 const board     = document.getElementById('board');
 const stringSvg = document.getElementById('string-svg');
 const memoLayer = document.getElementById('memo-layer');
+
+// string-svg 크기를 배경 SVG와 동기화 (CSS 하드코딩 제거)
+stringSvg.setAttribute('width',  SVG_W);
+stringSvg.setAttribute('height', SVG_H);
 
 // ── Supabase API ──
 const SB = {
@@ -505,18 +529,8 @@ function fitBoard() {
   panY  = 10;
   applyTransform();
 }
-function svgToScreen(svgX, svgY) {
-  return { x: svgX * scale + panX, y: svgY * scale + panY };
-}
-function screenToSvg(sx, sy) {
-  return { x: (sx - panX) / scale, y: (sy - panY) / scale };
-}
 function repositionMemos() {
-  Object.values(memoMap).forEach(({ m, el }) => {
-    const sc = svgToScreen(m.svgX, m.svgY);
-    el.style.left = (sc.x - MEMO_W / 2) + 'px';
-    el.style.top  = (sc.y - MEMO_H / 2) + 'px';
-  });
+  // memo-layer가 #board 안에 있어 transform 자동 적용 — 재계산 불필요
   updateStrings();
 }
 
@@ -637,15 +651,14 @@ function updateStrings() {
 // ── 메모 생성 ──
 function makeMemo(m) {
   if (memoMap[m.id]) return;
-  const sc    = svgToScreen(m.svgX, m.svgY);
   const el    = document.createElement('div');
   const isOwn = ownMemoIds.has(m.id);
   el.className  = 'memo-card';
   el.dataset.id = m.id;
-  el.style.cssText = `width:${MEMO_W}px;left:${sc.x-MEMO_W/2}px;top:${sc.y-MEMO_H/2}px;transform:rotate(${m.angle}deg);z-index:${20+(memoOrder%30)};`;
+  el.style.cssText = `width:${MEMO_W_SVG}px;left:${m.svgX-MEMO_W_SVG/2}px;top:${m.svgY-MEMO_H_SVG/2}px;transform:rotate(${m.angle}deg);z-index:${20+(memoOrder%30)};`;
   el.innerHTML = `
     <div class="memo-pin" style="background:${m.color}"></div>
-    <div class="memo-paper" style="min-height:${MEMO_H*0.75}px">
+    <div class="memo-paper" style="min-height:${MEMO_H_SVG*0.2}px">
       ${isOwn ? '<button class="memo-del">×</button>' : ''}
       <div class="memo-text">${escHtml(m.text)}</div>
       <div class="memo-author">${escHtml(m.author)}</div>
@@ -667,33 +680,34 @@ function escHtml(s) {
 
 // ── 드래그 ──
 function makeDraggable(el, m, isOwn) {
-  let startCX, startCY, startSX, startSY, moved;
+  if (!isOwn) return;  // 본인 메모만 드래그 가능
+  const paper = el.querySelector('.memo-paper');
+  let startCX, startCY, startSVGX, startSVGY, moved;
 
   function onStart(cx, cy) {
-    const sc = svgToScreen(m.svgX, m.svgY);
     startCX = cx; startCY = cy;
-    startSX = sc.x; startSY = sc.y;
-    moved   = false;
+    startSVGX = m.svgX; startSVGY = m.svgY;
+    moved = false;
     el.style.zIndex = 200;
   }
   function onMove(cx, cy) {
     const dx = cx - startCX, dy = cy - startCY;
     if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
-    const newSX = startSX + dx, newSY = startSY + dy;
-    el.style.left = (newSX - MEMO_W/2) + 'px';
-    el.style.top  = (newSY - MEMO_H/2) + 'px';
-    const sv = screenToSvg(newSX, newSY);
-    m.svgX = sv.x; m.svgY = sv.y;
+    m.svgX = startSVGX + dx / scale;
+    m.svgY = startSVGY + dy / scale;
+    el.style.left = (m.svgX - MEMO_W_SVG/2) + 'px';
+    el.style.top  = (m.svgY - MEMO_H_SVG/2) + 'px';
     updateStrings();
   }
   function onEnd() {
     el.style.zIndex = 20 + (memoOrder % 30);
-    if (moved && isOwn && CONFIGURED) {
+    if (moved && CONFIGURED) {
       SB.update(m.id, { svgX: +m.svgX.toFixed(2), svgY: +m.svgY.toFixed(2) }).catch(() => {});
     }
   }
 
-  el.addEventListener('mousedown', e => {
+  // 메모지(paper) 부분만 드래그
+  paper.addEventListener('mousedown', e => {
     if (e.target.classList.contains('memo-del')) return;
     e.preventDefault(); e.stopPropagation();
     onStart(e.clientX, e.clientY);
@@ -703,26 +717,24 @@ function makeDraggable(el, m, isOwn) {
     window.addEventListener('mouseup', mu);
   });
 
-  el.addEventListener('touchstart', e => {
+  paper.addEventListener('touchstart', e => {
     if (e.touches.length !== 1) return;
     e.stopPropagation();
     onStart(e.touches[0].clientX, e.touches[0].clientY);
     const tm = ev => { ev.preventDefault(); ev.stopPropagation(); onMove(ev.touches[0].clientX, ev.touches[0].clientY); };
-    const te = () => { onEnd(); el.removeEventListener('touchmove', tm); el.removeEventListener('touchend', te); };
-    el.addEventListener('touchmove', tm, { passive: false });
-    el.addEventListener('touchend',  te, { passive: true });
+    const te = () => { onEnd(); paper.removeEventListener('touchmove', tm); paper.removeEventListener('touchend', te); };
+    paper.addEventListener('touchmove', tm, { passive: false });
+    paper.addEventListener('touchend',  te, { passive: true });
   }, { passive: true });
 
   // 모바일 더블탭 수정
-  if (isOwn) {
-    let lastTap = 0;
-    el.addEventListener('touchend', e => {
-      if (e.changedTouches.length !== 1) return;
-      const now = Date.now();
-      if (now - lastTap < 350) startEdit(el, m);
-      lastTap = now;
-    }, { passive: true });
-  }
+  let lastTap = 0;
+  el.addEventListener('touchend', e => {
+    if (e.changedTouches.length !== 1) return;
+    const now = Date.now();
+    if (now - lastTap < 350) startEdit(el, m);
+    lastTap = now;
+  }, { passive: true });
 }
 
 // ── 수정 / 삭제 ──
@@ -761,10 +773,6 @@ function randCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
-const FLOORS = [
-  {top:68,bot:148},{top:148,bot:288},{top:338,bot:468},{top:468,bot:618},
-  {top:618,bot:868},{top:868,bot:1048},{top:1048,bot:1248},{top:1248,bot:1328},{top:1328,bot:1510}
-];
 function randPos(idx) {
   const f = FLOORS[idx % FLOORS.length];
   return { svgX: 90 + Math.random() * 500, svgY: f.top + (f.bot-f.top)*0.15 + Math.random()*(f.bot-f.top)*0.7 };
@@ -829,9 +837,8 @@ async function syncAll() {
         // 다른 사람이 이동하거나 수정한 내용 반영
         const entry = memoMap[m.id];
         entry.m.svgX = m.svgX; entry.m.svgY = m.svgY; entry.m.text = m.text;
-        const sc = svgToScreen(m.svgX, m.svgY);
-        entry.el.style.left = (sc.x - MEMO_W/2) + 'px';
-        entry.el.style.top  = (sc.y - MEMO_H/2) + 'px';
+        entry.el.style.left = (m.svgX - MEMO_W_SVG/2) + 'px';
+        entry.el.style.top  = (m.svgY - MEMO_H_SVG/2) + 'px';
         const textEl = entry.el.querySelector('.memo-text');
         if (textEl && !textEl.querySelector('textarea')) textEl.innerHTML = escHtml(m.text);
       }
@@ -843,76 +850,114 @@ async function syncAll() {
   }
 }
 
-// ── 스크린샷 (SVG 직렬화, 외부 라이브러리 불필요) ──
+// ── 스크린샷 ──
+
+function buildMemoSvgGroup(m, ns) {
+  const g = document.createElementNS(ns, 'g');
+  g.setAttribute('transform', `translate(${m.svgX},${m.svgY}) rotate(${m.angle})`);
+
+  // clipPath로 rect 밖 텍스트 잘라내기
+  const clipId = `clip-${m.id}`;
+  const defs   = document.createElementNS(ns, 'defs');
+  const clip   = document.createElementNS(ns, 'clipPath');
+  clip.setAttribute('id', clipId);
+  const clipRect = document.createElementNS(ns, 'rect');
+  clipRect.setAttribute('x', '-35'); clipRect.setAttribute('y', '-26');
+  clipRect.setAttribute('width', '70'); clipRect.setAttribute('height', '52');
+  clip.appendChild(clipRect);
+  defs.appendChild(clip);
+  g.appendChild(defs);
+
+  const cardRect = document.createElementNS(ns, 'rect');
+  cardRect.setAttribute('x', '-35'); cardRect.setAttribute('y', '-26');
+  cardRect.setAttribute('width', '70'); cardRect.setAttribute('height', '52');
+  cardRect.setAttribute('fill', 'rgba(242,238,224,0.92)');
+  g.appendChild(cardRect);
+
+  const pin = document.createElementNS(ns, 'circle');
+  pin.setAttribute('cx', '0'); pin.setAttribute('cy', '-30');
+  pin.setAttribute('r', '4'); pin.setAttribute('fill', m.color);
+  g.appendChild(pin);
+
+  // 텍스트 그룹에 clipPath 적용
+  // 한글 기준 글자 너비: font-size 6 × 약 1.1 ≈ 7px/char → 60px 너비에 약 8자
+  const textG = document.createElementNS(ns, 'g');
+  textG.setAttribute('clip-path', `url(#${clipId})`);
+  const lines = m.text.split('\n').slice(0, 6);
+  lines.forEach((line, i) => {
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', '-30'); t.setAttribute('y', String(-16 + i * 8));
+    t.setAttribute('font-size', '6'); t.setAttribute('fill', '#1a1814');
+    t.setAttribute('font-family', 'Georgia, serif');
+    t.textContent = line.slice(0, 9);
+    textG.appendChild(t);
+  });
+  const auth = document.createElementNS(ns, 'text');
+  auth.setAttribute('x', '32'); auth.setAttribute('y', '22');
+  auth.setAttribute('font-size', '4.5'); auth.setAttribute('fill', '#888');
+  auth.setAttribute('text-anchor', 'end'); auth.setAttribute('font-family', 'Georgia, serif');
+  auth.textContent = m.author;
+  textG.appendChild(auth);
+  g.appendChild(textG);
+
+  return g;
+}
+
 document.getElementById('shot-btn').onclick = async () => {
   toast('캡처 중...');
   try {
-    const ns  = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('xmlns', ns);
-    svg.setAttribute('viewBox', `0 0 ${SVG_W} ${SVG_H}`);
-    svg.setAttribute('width',  String(SVG_W * 2));
-    svg.setAttribute('height', String(SVG_H * 2));
+    const ns = 'http://www.w3.org/2000/svg';
 
-    // 호텔 맵
-    Array.from(document.getElementById('hotel-svg').childNodes)
-      .forEach(n => svg.appendChild(n.cloneNode(true)));
-    // 실 연결
-    Array.from(stringSvg.childNodes)
-      .forEach(n => svg.appendChild(n.cloneNode(true)));
-    // 메모 카드
-    Object.values(memoMap).forEach(({ m }) => {
-      const g = document.createElementNS(ns, 'g');
-      g.setAttribute('transform', `translate(${m.svgX},${m.svgY}) rotate(${m.angle})`);
-      const rect = document.createElementNS(ns, 'rect');
-      rect.setAttribute('x','-35'); rect.setAttribute('y','-26');
-      rect.setAttribute('width','70'); rect.setAttribute('height','52');
-      rect.setAttribute('fill','rgba(242,238,224,0.92)');
-      g.appendChild(rect);
-      const pin = document.createElementNS(ns, 'circle');
-      pin.setAttribute('cx','0'); pin.setAttribute('cy','-30');
-      pin.setAttribute('r','4'); pin.setAttribute('fill', m.color);
-      g.appendChild(pin);
-      m.text.split('\n').slice(0, 5).forEach((line, i) => {
-        const t = document.createElementNS(ns, 'text');
-        t.setAttribute('x','-30'); t.setAttribute('y', String(-14 + i * 9));
-        t.setAttribute('font-size','7'); t.setAttribute('fill','#1a1814');
-        t.setAttribute('font-family','monospace');
-        t.textContent = line.slice(0, 20);
-        g.appendChild(t);
+    // Blob SVG → img → canvas 렌더링 시 CSS(<style>, inline style) 모두 무시될 수 있어서
+    // 모든 text의 스타일을 presentation attribute로 변환하고 style attribute를 제거함
+    const svg = document.getElementById('hotel-svg').cloneNode(true);
+
+    // <defs><style> 제거: Blob 렌더링 시 element selector `text{fill:#e8e4d9}`는 작동하지만
+    // class selector `.rl{fill:#b8b4a9}` 등은 작동 안 해서 모든 글자가 흰색이 됨.
+    // 제거 후 아래에서 presentation attribute로 직접 설정하면 정확히 적용됨.
+    const defsStyle = svg.querySelector('defs style');
+    if (defsStyle) defsStyle.remove();
+
+    const fillMap     = { fl:'#e8e4d9', rl:'#b8b4a9', sl:'#e8e4d9', dl:'#787468' };
+    const fontSizeMap = { fl:'13', rl:'9', sl:'11', dl:'8' };
+    const boldSet     = new Set(['fl', 'sl']);
+    svg.querySelectorAll('text').forEach(t => {
+      // 1단계: inline style을 파싱해서 각 속성을 presentation attribute로 이동
+      const styleStr = t.getAttribute('style') || '';
+      styleStr.split(';').forEach(chunk => {
+        const colon = chunk.indexOf(':');
+        if (colon < 0) return;
+        const prop = chunk.slice(0, colon).trim();
+        const val  = chunk.slice(colon + 1).trim();
+        if (prop && val) t.setAttribute(prop, val);
       });
-      const auth = document.createElementNS(ns, 'text');
-      auth.setAttribute('x','32'); auth.setAttribute('y','22');
-      auth.setAttribute('font-size','5'); auth.setAttribute('fill','#888');
-      auth.setAttribute('text-anchor','end'); auth.setAttribute('font-family','monospace');
-      auth.textContent = m.author;
-      g.appendChild(auth);
-      svg.appendChild(g);
+      t.removeAttribute('style');
+
+      // 2단계: class 기반 스타일을 아직 설정 안 된 속성에만 적용
+      const cls = t.getAttribute('class') || '';
+      if (!t.hasAttribute('fill'))        t.setAttribute('fill',        fillMap[cls]     ?? '#e8e4d9');
+      if (!t.hasAttribute('font-family')) t.setAttribute('font-family', 'Georgia, serif');
+      if (!t.hasAttribute('font-size') && fontSizeMap[cls]) t.setAttribute('font-size', fontSizeMap[cls]);
+      if (!t.hasAttribute('font-weight') && boldSet.has(cls)) t.setAttribute('font-weight', 'bold');
     });
+    svg.setAttribute('xmlns', ns);
+    svg.setAttribute('viewBox', `0 0 ${SVG_W} ${SVG_CAPTURE_H}`);
+    svg.setAttribute('width',  String(SVG_W * 2));
+    svg.setAttribute('height', String(SVG_CAPTURE_H * 2));
+
+    // 실 연결
+    Array.from(stringSvg.childNodes).forEach(n => svg.appendChild(n.cloneNode(true)));
+    // 메모 카드
+    Object.values(memoMap).forEach(({ m }) => svg.appendChild(buildMemoSvgGroup(m, ns)));
 
     const svgStr = new XMLSerializer().serializeToString(svg);
     const blob   = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
     const url    = URL.createObjectURL(blob);
-
-    await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = SVG_W * 2; canvas.height = SVG_H * 2;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#080808';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
-        const a = document.createElement('a');
-        a.href     = canvas.toDataURL('image/png');
-        a.download = `SNM_${roomCode}_${new Date().toISOString().slice(0,10)}.png`;
-        a.click();
-        resolve();
-      };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(); };
-      img.src = url;
-    });
+    const a      = document.createElement('a');
+    a.href     = url;
+    a.download = `SNM_${roomCode}_${new Date().toISOString().slice(0,10)}.svg`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
     toast('저장 완료!');
   } catch (e) {
     toast('캡처 실패');
