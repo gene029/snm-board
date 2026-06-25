@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier New',monospace}
+
+#app{width:100%;height:100vh;display:flex;flex-direction:column;background:#080808}
+
+#setup{
+  position:fixed;inset:0;background:rgba(8,8,8,0.97);
+  display:flex;align-items:center;justify-content:center;
+  z-index:2000;padding:20px;overflow-y:auto;
+}
+.setup-box{border:1px solid #e8e4d9;padding:28px 32px;max-width:340px;width:100%}
+.setup-box h2{color:#e8e4d9;font-family:Georgia,serif;font-size:18px;letter-spacing:2px;margin-bottom:4px;font-weight:400}
+.setup-box .sub{color:#787468;font-size:10px;letter-spacing:3px;margin-bottom:24px}
+.setup-box label{display:block;color:#b8b4a9;font-size:11px;margin-bottom:6px;letter-spacing:1px}
+.setup-box input{
+  width:100%;background:transparent;border:none;border-bottom:1px solid #444;
+  color:#e8e4d9;font-family:'Courier New',monospace;
+  font-size:15px;padding:6px 0;outline:none;margin-bottom:16px;
+}
+.room-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:6px}
+.room-row input{margin-bottom:0;flex:1}
+.btn-gen{
+  background:transparent;border:1px solid #555;color:#b8b4a9;
+  font-family:'Courier New',monospace;font-size:10px;padding:6px 10px;
+  cursor:pointer;white-space:nowrap;flex-shrink:0;
+}
+.btn-gen:hover{border-color:#e8e4d9;color:#e8e4d9}
+.room-hint{font-size:9px;color:#484440;margin-bottom:16px;letter-spacing:1px}
+.pin-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:24px}
+.pin-opt{width:36px;height:36px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:border-color 0.15s}
+.pin-opt.selected{border-color:#e8e4d9}
+.btn-enter{
+  width:100%;background:transparent;border:1px solid #e8e4d9;
+  color:#e8e4d9;font-family:'Courier New',monospace;
+  font-size:13px;padding:10px;cursor:pointer;letter-spacing:2px;
+}
+.btn-enter:hover{background:rgba(232,228,217,0.08)}
+.setup-err{color:#c0392b;font-size:11px;margin-bottom:10px;min-height:16px}
+
+#toolbar{
+  background:rgba(8,8,8,0.96);border-bottom:1px solid #222;
+  padding:8px 14px;display:none;align-items:center;
+  gap:8px;flex-wrap:wrap;flex-shrink:0;z-index:100;
+}
+.user-badge{display:flex;align-items:center;gap:6px;color:#e8e4d9;font-size:11px;letter-spacing:1px}
+.pin-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.room-badge{color:#787468;font-size:10px;letter-spacing:1px;border-left:1px solid #333;padding-left:8px}
+.timer-badge{font-size:10px;color:#787468;letter-spacing:1px}
+#timer-txt{color:#b8b4a9}
+.tb-btn{
+  background:transparent;border:1px solid #444;color:#e8e4d9;
+  font-family:'Courier New',monospace;
+  font-size:11px;padding:5px 10px;cursor:pointer;white-space:nowrap;
+}
+.tb-btn:hover{border-color:#e8e4d9}
+#sync-btn{margin-left:auto}
+
+#board-wrap{flex:1;overflow:hidden;position:relative;background:#080808;touch-action:none}
+#board{position:absolute;transform-origin:0 0;will-change:transform}
+
+#string-svg{
+  position:absolute;top:0;left:0;width:680px;height:1980px;
+  pointer-events:none;z-index:5;overflow:visible;
+}
+
+#memo-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:20}
+
+.memo-card{position:absolute;pointer-events:auto;user-select:none;touch-action:none}
+.memo-pin{
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  width:18px;height:18px;border-radius:50%;
+  box-shadow:0 2px 5px rgba(0,0,0,0.7);z-index:2;
+}
+.memo-paper{
+  background:rgba(242,238,224,0.92);padding:10px 10px 20px;position:relative;
+  font-family:'Courier New',monospace;font-size:11px;line-height:1.7;color:#1a1814;
+  word-break:break-all;white-space:pre-wrap;box-shadow:2px 3px 10px rgba(0,0,0,0.5);
+}
+.memo-author{position:absolute;bottom:4px;right:7px;font-size:8px;color:#888;letter-spacing:1px}
+.memo-del{
+  position:absolute;top:3px;right:4px;
+  background:none;border:none;color:#aaa;font-size:13px;
+  cursor:pointer;line-height:1;padding:0 2px;display:none;
+}
+.memo-card:hover .memo-del{display:block}
+.memo-edit-area{
+  width:100%;background:transparent;border:none;outline:none;
+  font-family:'Courier New',monospace;font-size:11px;line-height:1.7;color:#1a1814;
+  resize:none;min-height:40px;
+}
+
+#compose{
+  position:fixed;bottom:0;left:0;width:100%;
+  background:rgba(8,8,8,0.97);border-top:1px solid #333;
+  padding:14px 18px;z-index:500;display:none;
+}
+#compose h3{color:#e8e4d9;font-size:10px;letter-spacing:2px;margin-bottom:8px}
+#compose textarea{
+  width:100%;background:rgba(242,238,224,0.06);border:1px solid #444;
+  color:#e8e4d9;font-family:'Courier New',monospace;
+  font-size:13px;padding:10px;resize:none;height:80px;outline:none;line-height:1.6;
+}
+.c-actions{display:flex;gap:8px;margin-top:8px}
+.c-actions button{
+  background:transparent;border:1px solid #555;color:#e8e4d9;
+  font-family:'Courier New',monospace;font-size:11px;padding:7px 14px;cursor:pointer;
+}
+.c-actions button:hover{border-color:#e8e4d9}
+
+#toast{
+  position:fixed;top:52px;left:50%;transform:translateX(-50%);
+  background:#1a1a1a;border:1px solid #555;color:#e8e4d9;
+  font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;
+  padding:7px 18px;z-index:600;opacity:0;transition:opacity 0.3s;
+  pointer-events:none;white-space:nowrap;
+}
+
+#config-banner{
+  position:fixed;top:0;left:0;width:100%;background:#c0392b;color:#fff;
+  font-size:11px;text-align:center;padding:6px;z-index:3000;letter-spacing:1px;display:none;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="config-banner">
+  ⚠ Supabase 미설정 — 공유 기능이 작동하지 않습니다. HTML 파일에서 SUPABASE_URL과 SUPABASE_KEY를 설정해주세요.
+</div>
+
+<div id="setup">
+  <div class="setup-box">
+    <h2>수사 보드</h2>
+    <p class="sub">SLEEP NO MORE · SEOUL</p>
+    <label>방 코드</label>
+    <div class="room-row">
+      <input id="room-input" type="text" placeholder="코드 입력 또는 생성" maxlength="5" autocomplete="off" spellcheck="false">
+      <button class="btn-gen" id="room-gen-btn">랜덤 생성</button>
+    </div>
+    <p class="room-hint">· 같은 코드로 입장한 사람끼리 공유 · 3시간 후 자동 삭제</p>
+    <label>닉네임</label>
+    <input id="nick-input" type="text" placeholder="이름을 입력하세요" maxlength="10" autocomplete="off">
+    <label>핀 색상 선택</label>
+    <div class="pin-grid" id="pin-grid"></div>
+    <p class="setup-err" id="setup-err"></p>
+    <button class="btn-enter" id="enter-btn">입장 →</button>
+  </div>
+</div>
+
+<div id="toolbar">
+  <div class="user-badge">
+    <div class="pin-dot" id="tb-pin"></div>
+    <span id="tb-name"></span>
+  </div>
+  <div class="room-badge" id="tb-room"></div>
+  <div class="timer-badge">⏱ <span id="timer-txt">3:00:00</span></div>
+  <button class="tb-btn" id="add-btn">+ 메모</button>
+  <button class="tb-btn" id="zoom-in-btn">＋</button>
+  <button class="tb-btn" id="zoom-out-btn">－</button>
+  <button class="tb-btn" id="reset-btn">⊙</button>
+  <button class="tb-btn" id="shot-btn">📷</button>
+  <button class="tb-btn" id="sync-btn">↻ 전체 공개</button>
+</div>
+
+<div id="board-wrap">
+  <div id="board">
+    <svg id="hotel-svg" width="680" viewBox="0 0 680 1980"
+         xmlns="http://www.w3.org/2000/svg" style="display:block">
+<defs><style>text{font-family:Georgia,serif;fill:#e8e4d9}.fl{font-size:13px;font-weight:bold;fill:#e8e4d9}.rl{font-size:9px;fill:#b8b4a9}.sl{font-size:11px;fill:#e8e4d9;font-weight:bold}.dl{font-size:8px;fill:#787468}</style></defs>
+<rect width="680" height="1980" fill="#080808"/>
+<text x="340" y="38" text-anchor="middle" style="font-size:15px;letter-spacing:3px">매키탄 호텔</text>
+<text x="340" y="56" text-anchor="middle" style="font-size:9px;fill:#787468;font-family:'Courier New',monospace;letter-spacing:5px">MAEKITAN HOTEL · CROSS SECTION</text>
+<line x1="60" y1="64" x2="620" y2="64" stroke="#e8e4d9" stroke-width="0.3" opacity="0.4"/>
+<line x1="60" y1="68" x2="60" y2="1610" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="620" y1="68" x2="620" y2="1610" stroke="#e8e4d9" stroke-width="0.5"/>
+<polygon points="220,90 340,68 460,90" fill="none" stroke="#e8e4d9" stroke-width="0.8"/>
+<rect x="260" y="90" width="160" height="55" fill="none" stroke="#e8e4d9" stroke-width="0.8"/>
+<rect x="305" y="100" width="30" height="20" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="320" y1="100" x2="320" y2="120" stroke="#e8e4d9" stroke-width="0.3"/><line x1="305" y1="110" x2="335" y2="110" stroke="#e8e4d9" stroke-width="0.3"/>
+<rect x="270" y="118" width="16" height="12" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<polygon points="270,118 278,112 286,118" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="294" y="120" width="12" height="10" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<polygon points="294,120 300,115 306,120" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="355" y="118" width="16" height="12" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<polygon points="355,118 363,112 371,118" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="378" y="120" width="14" height="10" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<polygon points="378,120 385,115 392,120" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="340" y="137" text-anchor="middle" class="sl">타이니 타운</text>
+<text x="266" y="154" class="dl">· 비밀의 장소</text>
+<text x="66" y="120" class="fl">8</text>
+<line x1="60" y1="148" x2="620" y2="148" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="340" y="166" text-anchor="middle" class="sl">킹 제임스 요양병원</text>
+<line x1="180" y1="172" x2="180" y2="285" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="310" y1="172" x2="310" y2="285" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="440" y1="172" x2="440" y2="285" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="530" y1="172" x2="530" y2="285" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="80" y="196" width="30" height="14" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="118" y="196" width="30" height="14" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="84" y1="203" x2="94" y2="203" stroke="#e8e4d9" stroke-width="0.3"/><line x1="122" y1="203" x2="132" y2="203" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="120" y="224" text-anchor="middle" class="rl">병동</text>
+<rect x="194" y="194" width="44" height="28" rx="3" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<ellipse cx="216" cy="208" rx="16" ry="9" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="216" y="236" text-anchor="middle" class="rl">욕조방</text>
+<rect x="320" y="192" width="50" height="36" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="326" y="198" width="18" height="12" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="345" y="244" text-anchor="middle" class="rl">간호사 사무실</text>
+<rect x="382" y="192" width="46" height="36" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="388" y="198" width="16" height="10" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="405" y="244" text-anchor="middle" class="rl">수간호사 사무실</text>
+<rect x="450" y="192" width="34" height="36" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
+<line x1="458" y1="192" x2="458" y2="228" stroke="#e8e4d9" stroke-width="0.3"/><line x1="466" y1="192" x2="466" y2="228" stroke="#e8e4d9" stroke-width="0.3"/><line x1="474" y1="192" x2="474" y2="228" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="467" y="244" text-anchor="middle" class="rl">폐쇄병동</text>
+<path d="M548 226 Q556 206 564 226" fill="none" stroke="#e8e4d9" stroke-width="0.6"/>
+<path d="M545 228 Q556 234 567 228" fill="none" stroke="#e8e4d9" stroke-width="0.8"/>
+<text x="556" y="244" text-anchor="middle" class="rl">흔들의자</text>
+<text x="66" y="175" class="fl">7</text>
+<line x1="60" y1="288" x2="620" y2="288" stroke="#e8e4d9" stroke-width="0.5"/>
+<polyline points="130,336 130,326 160,326 160,316 190,316 190,306 220,306 220,296 250,296 250,290" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
+<line x1="380" y1="290" x2="380" y2="336" stroke="#e8e4d9" stroke-width="0.6"/><line x1="393" y1="292" x2="393" y2="336" stroke="#e8e4d9" stroke-width="0.4"/><line x1="407" y1="291" x2="407" y2="336" stroke="#e8e4d9" stroke-width="0.6"/><line x1="421" y1="293" x2="421" y2="336" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="375" y1="305" x2="386" y2="305" stroke="#e8e4d9" stroke-width="0.3"/><line x1="400" y1="308" x2="412" y2="308" stroke="#e8e4d9" stroke-width="0.3"/><line x1="415" y1="300" x2="428" y2="300" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="340" y="322" text-anchor="middle" class="dl">숲 계단</text>
+<text x="66" y="318" class="fl" style="font-size:10px">6.5</text>
+<line x1="60" y1="338" x2="620" y2="338" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="340" y="356" text-anchor="middle" class="sl">자작나무 숲</text>
+<line x1="82" y1="360" x2="82" y2="465" stroke="#e8e4d9" stroke-width="1.2"/><line x1="78" y1="378" x2="87" y2="378" stroke="#e8e4d9" stroke-width="0.4"/><line x1="79" y1="400" x2="86" y2="400" stroke="#e8e4d9" stroke-width="0.3"/><line x1="78" y1="422" x2="87" y2="422" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="98" y1="362" x2="98" y2="465" stroke="#e8e4d9" stroke-width="0.7"/><line x1="95" y1="390" x2="102" y2="390" stroke="#e8e4d9" stroke-width="0.3"/><line x1="95" y1="418" x2="102" y2="418" stroke="#e8e4d9" stroke-width="0.3"/>
+<line x1="113" y1="360" x2="113" y2="465" stroke="#e8e4d9" stroke-width="1.0"/><line x1="109" y1="376" x2="118" y2="376" stroke="#e8e4d9" stroke-width="0.4"/><line x1="110" y1="404" x2="117" y2="404" stroke="#e8e4d9" stroke-width="0.3"/><line x1="109" y1="432" x2="118" y2="432" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="160" y1="360" x2="160" y2="465" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="300" y1="360" x2="300" y2="465" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="420" y1="360" x2="420" y2="465" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="172" y1="360" x2="172" y2="465" stroke="#e8e4d9" stroke-width="0.9"/><line x1="168" y1="382" x2="177" y2="382" stroke="#e8e4d9" stroke-width="0.4"/><line x1="169" y1="408" x2="176" y2="408" stroke="#e8e4d9" stroke-width="0.3"/><line x1="168" y1="432" x2="177" y2="432" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="186" y1="362" x2="186" y2="465" stroke="#e8e4d9" stroke-width="0.6"/><line x1="183" y1="396" x2="190" y2="396" stroke="#e8e4d9" stroke-width="0.3"/>
+<polygon points="66,418 96,400 126,418" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="72" y="418" width="52" height="36" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="88" y="430" width="14" height="24" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="98" y="466" text-anchor="middle" class="rl">오두막</text>
+<rect x="208" y="373" width="84" height="62" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="218" y="385" width="40" height="20" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="250" y="450" text-anchor="middle" class="rl">해부실습실</text>
+<line x1="314" y1="360" x2="314" y2="465" stroke="#e8e4d9" stroke-width="0.8"/><line x1="330" y1="362" x2="330" y2="465" stroke="#e8e4d9" stroke-width="0.6"/>
+<line x1="360" y1="375" x2="360" y2="442" stroke="#e8e4d9" stroke-width="0.6"/><line x1="343" y1="390" x2="377" y2="390" stroke="#e8e4d9" stroke-width="0.6"/>
+<text x="360" y="456" text-anchor="middle" class="rl">기도실</text>
+<line x1="433" y1="360" x2="433" y2="465" stroke="#e8e4d9" stroke-width="0.9"/><line x1="448" y1="362" x2="448" y2="465" stroke="#e8e4d9" stroke-width="0.6"/><line x1="464" y1="360" x2="464" y2="465" stroke="#e8e4d9" stroke-width="0.8"/>
+<rect x="478" y="373" width="72" height="52" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="514" y="438" text-anchor="middle" class="rl">사무실</text>
+<line x1="558" y1="360" x2="558" y2="465" stroke="#e8e4d9" stroke-width="0.9"/><line x1="574" y1="362" x2="574" y2="465" stroke="#e8e4d9" stroke-width="0.7"/><line x1="590" y1="360" x2="590" y2="465" stroke="#e8e4d9" stroke-width="1.0"/><line x1="606" y1="363" x2="606" y2="465" stroke="#e8e4d9" stroke-width="0.6"/>
+<text x="66" y="365" class="fl">6</text>
+<line x1="60" y1="468" x2="620" y2="468" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="420" y1="468" x2="420" y2="618" stroke="#e8e4d9" stroke-width="0.7"/>
+<text x="230" y="486" text-anchor="middle" class="sl">맥더프 부부 집</text>
+<line x1="200" y1="492" x2="200" y2="615" stroke="#e8e4d9" stroke-width="0.5"/><line x1="320" y1="492" x2="320" y2="615" stroke="#e8e4d9" stroke-width="0.5"/><line x1="480" y1="492" x2="480" y2="615" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="78" y="508" width="30" height="52" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="78" y1="520" x2="108" y2="520" stroke="#e8e4d9" stroke-width="0.3"/>
+<rect x="114" y="508" width="30" height="52" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="114" y1="520" x2="144" y2="520" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="130" y="574" text-anchor="middle" class="rl">침실</text>
+<rect x="215" y="503" width="52" height="40" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="241" y="558" text-anchor="middle" class="rl">거실</text>
+<path d="M332 543 Q345 533 358 543" fill="none" stroke="#e8e4d9" stroke-width="0.6"/>
+<path d="M330 546 Q345 556 360 546" fill="none" stroke="#e8e4d9" stroke-width="0.8"/>
+<text x="345" y="572" text-anchor="middle" class="rl">아기방</text>
+<rect x="430" y="503" width="36" height="50" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="448" y="568" text-anchor="middle" class="rl">어린이방</text>
+<line x1="388" y1="498" x2="388" y2="558" stroke="#e8e4d9" stroke-width="0.6"/><line x1="372" y1="512" x2="404" y2="512" stroke="#e8e4d9" stroke-width="0.6"/>
+<text x="388" y="574" text-anchor="middle" class="rl">기도실</text>
+<text x="550" y="486" text-anchor="middle" class="sl">교회 복도</text>
+<path d="M498 528 Q498 503 515 503 Q532 503 532 528" fill="none" stroke="#e8e4d9" stroke-width="0.6"/>
+<path d="M540 528 Q540 503 557 503 Q574 503 574 528" fill="none" stroke="#e8e4d9" stroke-width="0.6"/>
+<line x1="498" y1="528" x2="498" y2="588" stroke="#e8e4d9" stroke-width="0.4"/><line x1="532" y1="528" x2="532" y2="588" stroke="#e8e4d9" stroke-width="0.4"/><line x1="540" y1="528" x2="540" y2="588" stroke="#e8e4d9" stroke-width="0.4"/><line x1="574" y1="528" x2="574" y2="588" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="66" y="495" class="fl">5</text>
+<line x1="60" y1="618" x2="620" y2="618" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="450" y1="618" x2="450" y2="868" stroke="#e8e4d9" stroke-width="0.8"/><line x1="542" y1="618" x2="542" y2="868" stroke="#e8e4d9" stroke-width="0.8"/>
+<line x1="60" y1="668" x2="450" y2="668" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="138" y1="618" x2="138" y2="668" stroke="#e8e4d9" stroke-width="0.3" stroke-dasharray="2 3"/>
+<line x1="216" y1="618" x2="216" y2="668" stroke="#e8e4d9" stroke-width="0.3" stroke-dasharray="2 3"/>
+<line x1="294" y1="618" x2="294" y2="668" stroke="#e8e4d9" stroke-width="0.3" stroke-dasharray="2 3"/>
+<line x1="372" y1="618" x2="372" y2="668" stroke="#e8e4d9" stroke-width="0.3" stroke-dasharray="2 3"/>
+<text x="240" y="636" text-anchor="middle" class="sl">갤로우 그린 마을</text>
+<text x="496" y="636" text-anchor="middle" class="sl">틴 앨리</text>
+<text x="581" y="636" text-anchor="middle" class="sl" style="font-size:9.5px">낡은 멘덜리 바</text>
+<circle cx="99" cy="628" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="99" y1="633" x2="99" y2="643" stroke="#e8e4d9" stroke-width="0.5"/><line x1="88" y1="637" x2="110" y2="637" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="99" y="666" text-anchor="middle" class="rl">재단사 가게</text>
+<path d="M177 622 L177 636 M171 624 L177 628 L183 624 M169 620 L171 624 M185 620 L183 624" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="177" y="666" text-anchor="middle" class="rl">박제소·뒷방</text>
+<rect x="246" y="622" width="4" height="14" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><rect x="254" y="620" width="4" height="16" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><rect x="262" y="623" width="4" height="13" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="255" y="666" text-anchor="middle" class="rl">약재방</text>
+<polygon points="316,622 321,618 345,618 350,622 350,646 345,650 321,650 316,646" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="333" y="666" text-anchor="middle" class="rl">장례식장</text>
+<circle cx="404" cy="630" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><circle cx="418" cy="628" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="411" y="666" text-anchor="middle" class="rl">사탕가게</text>
+<line x1="240" y1="668" x2="240" y2="868" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="150" y="684" text-anchor="middle" class="sl" style="font-size:10px">아그네스 집</text>
+<rect x="68" y="694" width="52" height="32" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="68" y="690" width="10" height="40" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="110" y="690" width="10" height="40" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="120" y="712" text-anchor="middle" class="rl">거실</text>
+<line x1="68" y1="756" x2="232" y2="756" stroke="#e8e4d9" stroke-width="0.3"/>
+<rect x="72" y="764" width="60" height="42" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="72" y1="778" x2="132" y2="778" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="143" y="790" text-anchor="middle" class="rl">침실</text>
+<ellipse cx="190" cy="790" rx="18" ry="24" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="182" y1="814" x2="198" y2="814" stroke="#e8e4d9" stroke-width="0.4"/><line x1="190" y1="814" x2="190" y2="824" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="345" y="684" text-anchor="middle" class="sl" style="font-size:10px">스픽이지바</text>
+<rect x="252" y="694" width="120" height="72" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.8"/>
+<rect x="258" y="700" width="108" height="60" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<circle cx="290" cy="728" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.5"/><circle cx="308" cy="720" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.5"/><circle cx="326" cy="728" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="252" y="790" width="186" height="18" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
+<circle cx="264" cy="818" r="7" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><circle cx="284" cy="818" r="7" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><circle cx="304" cy="818" r="7" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><circle cx="324" cy="818" r="7" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><circle cx="344" cy="818" r="7" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><circle cx="364" cy="818" r="7" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="345" y="856" text-anchor="middle" class="rl">당구대 · 바</text>
+<line x1="458" y1="644" x2="458" y2="862" stroke="#e8e4d9" stroke-width="0.4"/><line x1="534" y1="644" x2="534" y2="862" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="462" y="700" width="68" height="16" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
+<text x="496" y="712" text-anchor="middle" style="font-size:6.5px;fill:#e8e4d9;font-family:'Courier New',monospace;letter-spacing:1px">HELLO THERE</text>
+<rect x="462" y="726" width="68" height="16" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.4" opacity="0.5"/>
+<text x="464" y="738" style="font-size:6.5px;fill:#e8e4d9;font-family:'Courier New',monospace;letter-spacing:1px" opacity="0.95">HEL</text><text x="482" y="738" style="font-size:6.5px;fill:#e8e4d9;font-family:'Courier New',monospace;letter-spacing:1px" opacity="0.12">L </text><text x="490" y="738" style="font-size:6.5px;fill:#e8e4d9;font-family:'Courier New',monospace;letter-spacing:1px" opacity="0.95">HER</text><text x="508" y="738" style="font-size:6.5px;fill:#e8e4d9;font-family:'Courier New',monospace;letter-spacing:1px" opacity="0.1">E</text>
+<rect x="552" y="720" width="60" height="28" fill="none" stroke="#e8e4d9" stroke-width="0.6"/>
+<path d="M552 720 Q558 734 552 748" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><path d="M612 720 Q606 734 612 748" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="582" y="742" text-anchor="middle" class="rl">무대</text>
+<rect x="554" y="754" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="566" y="754" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="578" y="754" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="590" y="754" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="602" y="754" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<rect x="554" y="764" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="566" y="764" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="578" y="764" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="590" y="764" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><rect x="602" y="764" width="8" height="6" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="66" y="650" class="fl">4</text>
+<line x1="60" y1="868" x2="620" y2="868" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="240" y1="888" x2="240" y2="1048" stroke="#e8e4d9" stroke-width="0.7"/><line x1="420" y1="888" x2="420" y2="1048" stroke="#e8e4d9" stroke-width="0.7"/><line x1="490" y1="888" x2="490" y2="1048" stroke="#e8e4d9" stroke-width="0.7"/><line x1="330" y1="904" x2="330" y2="1048" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="150" y="902" text-anchor="middle" class="sl">연회장 발코니</text>
+<line x1="72" y1="922" x2="232" y2="922" stroke="#e8e4d9" stroke-width="0.6"/>
+<line x1="86" y1="922" x2="86" y2="944" stroke="#e8e4d9" stroke-width="0.4"/><line x1="104" y1="922" x2="104" y2="944" stroke="#e8e4d9" stroke-width="0.4"/><line x1="122" y1="922" x2="122" y2="944" stroke="#e8e4d9" stroke-width="0.4"/><line x1="140" y1="922" x2="140" y2="944" stroke="#e8e4d9" stroke-width="0.4"/><line x1="158" y1="922" x2="158" y2="944" stroke="#e8e4d9" stroke-width="0.4"/><line x1="176" y1="922" x2="176" y2="944" stroke="#e8e4d9" stroke-width="0.4"/><line x1="194" y1="922" x2="194" y2="944" stroke="#e8e4d9" stroke-width="0.4"/><line x1="212" y1="922" x2="212" y2="944" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="330" y="902" text-anchor="middle" class="sl">맥베스 부부 집</text>
+<rect x="250" y="916" width="72" height="52" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.6"/>
+<line x1="250" y1="932" x2="322" y2="932" stroke="#e8e4d9" stroke-width="0.3"/>
+<ellipse cx="268" cy="924" rx="11" ry="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><ellipse cx="304" cy="924" rx="11" ry="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="286" y="984" text-anchor="middle" class="rl">침실</text>
+<rect x="252" y="992" width="68" height="42" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="286" y1="992" x2="286" y2="1034" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="313" y="1044" text-anchor="middle" class="rl">드레스룸</text>
+<line x1="340" y1="916" x2="410" y2="916" stroke="#e8e4d9" stroke-width="0.5"/>
+<path d="M348 916 Q352 910 356 916" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><path d="M360 916 Q364 910 368 916" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><path d="M372 916 Q376 910 380 916" fill="none" stroke="#e8e4d9" stroke-width="0.4"/><path d="M384 916 Q388 910 392 916" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<ellipse cx="365" cy="978" rx="20" ry="26" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="355" y1="1004" x2="375" y2="1004" stroke="#e8e4d9" stroke-width="0.4"/><line x1="365" y1="1004" x2="365" y2="1020" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="555" y="902" text-anchor="middle" class="sl">욕조</text>
+<rect x="500" y="920" width="100" height="56" rx="10" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
+<ellipse cx="550" cy="948" rx="40" ry="20" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="528" y="890" width="44" height="26" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="66" y="902" class="fl">3</text>
+<line x1="60" y1="1048" x2="620" y2="1048" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="240" y1="1068" x2="240" y2="1248" stroke="#e8e4d9" stroke-width="0.7"/><line x1="450" y1="1068" x2="450" y2="1248" stroke="#e8e4d9" stroke-width="0.7"/>
+<text x="150" y="1068" text-anchor="middle" class="sl">던컨 왕의 방</text>
+<line x1="150" y1="1080" x2="150" y2="1248" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="72" y="1088" width="68" height="80" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="72" y1="1106" x2="140" y2="1106" stroke="#e8e4d9" stroke-width="0.3"/><line x1="72" y1="1124" x2="140" y2="1124" stroke="#e8e4d9" stroke-width="0.3"/>
+<line x1="104" y1="1088" x2="104" y2="1168" stroke="#e8e4d9" stroke-width="0.2"/>
+<text x="106" y="1182" text-anchor="middle" class="rl">서재</text>
+<line x1="168" y1="1098" x2="168" y2="1152" stroke="#e8e4d9" stroke-width="0.6"/><line x1="152" y1="1112" x2="184" y2="1112" stroke="#e8e4d9" stroke-width="0.6"/>
+<text x="168" y="1174" text-anchor="middle" class="rl">기도실</text>
+<rect x="68" y="1188" width="160" height="48" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="160" y="1226" text-anchor="middle" class="rl">침실·댄버스 방</text>
+<text x="345" y="1068" text-anchor="middle" class="sl">연회장</text>
+<path d="M256 1116 Q256 1096 270 1096 Q284 1096 284 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<path d="M296 1116 Q296 1096 310 1096 Q324 1096 324 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<path d="M336 1116 Q336 1096 350 1096 Q364 1096 364 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<path d="M376 1116 Q376 1096 390 1096 Q404 1096 390 1116" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<line x1="256" y1="1116" x2="256" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="284" y1="1116" x2="284" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="296" y1="1116" x2="296" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="324" y1="1116" x2="324" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="336" y1="1116" x2="336" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="364" y1="1116" x2="364" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="376" y1="1116" x2="376" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/><line x1="404" y1="1116" x2="404" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="256" y1="1156" x2="440" y2="1156" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="274" y="1166" width="80" height="60" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<rect x="366" y="1166" width="72" height="68" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<path d="M379 1166 Q379 1151 387 1151 Q395 1151 395 1166" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<path d="M401 1166 Q401 1151 409 1151 Q417 1151 417 1166" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="402" y="1240" text-anchor="middle" class="rl">예배실</text>
+<text x="535" y="1068" text-anchor="middle" class="sl">호텔 로비</text>
+<line x1="535" y1="1080" x2="535" y2="1248" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="458" y="1086" width="68" height="28" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="492" y="1126" text-anchor="middle" class="rl">컨시어지</text>
+<path d="M548 1092 L548 1120 Q548 1130 558 1130 L576 1130 L576 1092 Z" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="562" y="1144" text-anchor="middle" class="rl">피아노 무대</text>
+<rect x="458" y="1154" width="60" height="22" rx="3" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="483" y="1148" text-anchor="middle" class="rl">소파</text>
+<rect x="546" y="1154" width="20" height="38" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="556" y="1204" text-anchor="middle" class="rl">폰부스</text>
+<rect x="458" y="1192" width="50" height="34" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<text x="483" y="1238" text-anchor="middle" class="rl">짐 보관소</text>
+<circle cx="588" cy="1205" r="14" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<circle cx="588" cy="1185" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="606" cy="1205" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="588" cy="1225" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="570" cy="1205" r="5" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="588" y="1240" text-anchor="middle" class="rl">다이닝룸</text>
+<text x="66" y="1080" class="fl">2</text>
+<line x1="60" y1="1248" x2="620" y2="1248" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="340" y="1266" text-anchor="middle" class="sl">입구</text>
+<path d="M310 1290 L310 1248 Q310 1235 340 1235 Q370 1235 370 1248 L370 1290" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
+<line x1="340" y1="1265" x2="340" y2="1320" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="265" y="1275" width="36" height="38" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<rect x="379" y="1275" width="36" height="38" fill="none" stroke="#e8e4d9" stroke-width="0.4"/>
+<line x1="250" y1="1320" x2="430" y2="1320" stroke="#e8e4d9" stroke-width="0.7"/>
+<line x1="240" y1="1325" x2="440" y2="1325" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="66" y="1278" class="fl">1</text>
+<line x1="60" y1="1328" x2="620" y2="1328" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="340" y="1346" text-anchor="middle" class="sl">맨덜리 바</text>
+<rect x="196" y="1450" width="288" height="52" rx="2" fill="none" stroke="#e8e4d9" stroke-width="0.7"/>
+<line x1="280" y1="1400" x2="240" y2="1450" stroke="#e8e4d9" stroke-width="0.2" opacity="0.4"/>
+<line x1="340" y1="1394" x2="340" y2="1450" stroke="#e8e4d9" stroke-width="0.2" opacity="0.4"/>
+<line x1="400" y1="1400" x2="440" y2="1450" stroke="#e8e4d9" stroke-width="0.2" opacity="0.4"/>
+<text x="340" y="1480" text-anchor="middle" class="rl">무대</text>
+<rect x="202" y="1408" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="222" y="1408" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="242" y="1408" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="262" y="1408" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="282" y="1408" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="302" y="1408" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="322" y="1408" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="342" y="1408" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/>
+<rect x="202" y="1426" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="222" y="1426" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="242" y="1426" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="262" y="1426" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="282" y="1426" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="302" y="1426" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="322" y="1426" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/><rect x="342" y="1426" width="14" height="10" rx="1" fill="none" stroke="#e8e4d9" stroke-width="0.35"/>
+<rect x="68" y="1360" width="100" height="100" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="72" y="1364" width="92" height="20" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<circle cx="82" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="100" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="118" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="136" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="118" y="1472" text-anchor="middle" class="rl">바</text>
+<rect x="512" y="1360" width="100" height="100" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<circle cx="524" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="542" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="560" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="578" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/><circle cx="596" cy="1396" r="6" fill="none" stroke="#e8e4d9" stroke-width="0.3"/>
+<text x="66" y="1358" class="fl">B1</text>
+<line x1="60" y1="1510" x2="620" y2="1510" stroke="#e8e4d9" stroke-width="0.5"/>
+<rect x="60" y="68" width="560" height="1442" fill="none" stroke="#e8e4d9" stroke-width="0.5"/>
+<text x="340" y="1532" text-anchor="middle" style="font-size:8px;fill:#484440;font-family:'Courier New',monospace;letter-spacing:3px">SLEEP NO MORE · SEOUL</text>
+    </svg>
+    <svg id="string-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div id="memo-layer"></div>
+</div>
+
+<div id="compose">
+  <h3>새 메모 — <span id="compose-user"></span></h3>
+  <textarea id="compose-text" placeholder="여기에 경험을 기록하세요..."></textarea>
+  <div class="c-actions">
+    <button id="c-submit">핀으로 꽂기</button>
+    <button id="c-cancel">취소</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://ildruorzfczzsxfszizs.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsZHJ1b3J6ZmN6enN4ZnN6aXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk0NTcsImV4cCI6MjA5NzkzNTQ1N30.dYB4qH6_kFjEnu1KWPNAuMIG6wQEwJ1LtJ21oNKoViI';
+
+const CONFIGURED = SUPABASE_URL !== 'YOUR_SUPABASE_URL';
+if (!CONFIGURED) document.getElementById('config-banner').style.display = 'block';
+
+const PIN_COLORS  = ['#c0392b','#2980b9','#27ae60','#e67e22','#8e44ad','#e91e8c'];
+const SVG_W       = 680;
+const SVG_H       = 1980;
+const THREE_HOURS = 3 * 60 * 60 * 1000;
+const MEMO_W      = 140;
+const MEMO_H      = 105;
+
+let user         = null;
+let roomCode     = '';
+let timerStarted = false;
+let scale = 1, panX = 0, panY = 0;
+let memoMap   = {};   // id → { m, el }
+let memoOrder = 0;
+const ownMemoIds = new Set();  // 이 세션에서 직접 작성한 메모 ID
+
+const boardWrap = document.getElementById('board-wrap');
+const board     = document.getElementById('board');
+const stringSvg = document.getElementById('string-svg');
+const memoLayer = document.getElementById('memo-layer');
+
+// ── Supabase API ──
+const SB = {
+  headers: {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+  },
+  async read(room) {
+    const r = await fetch(
+      `${SUPABASE_URL}/rest/v1/memos?room=eq.${encodeURIComponent(room)}&order=ts.asc&select=*`,
+      { headers: { ...SB.headers, 'Prefer': '' } }
+    );
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  },
+  async insert(memo) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/memos`, {
+      method: 'POST', headers: SB.headers, body: JSON.stringify(memo)
+    });
+    if (!r.ok) throw new Error(await r.text());
+  },
+  async update(id, fields) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/memos?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH', headers: SB.headers, body: JSON.stringify(fields)
+    });
+    if (!r.ok) throw new Error(await r.text());
+  },
+  async remove(id) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/memos?id=eq.${encodeURIComponent(id)}`, {
+      method: 'DELETE', headers: SB.headers
+    });
+    if (!r.ok) throw new Error(await r.text());
+  }
+};
+
+// ── Transform ──
+function applyTransform() {
+  board.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+}
+function fitBoard() {
+  const ww = boardWrap.clientWidth, wh = boardWrap.clientHeight;
+  scale = Math.min(ww / SVG_W, wh / SVG_H) * 0.95;
+  panX  = (ww - SVG_W * scale) / 2;
+  panY  = 10;
+  applyTransform();
+}
+function svgToScreen(svgX, svgY) {
+  return { x: svgX * scale + panX, y: svgY * scale + panY };
+}
+function screenToSvg(sx, sy) {
+  return { x: (sx - panX) / scale, y: (sy - panY) / scale };
+}
+function repositionMemos() {
+  Object.values(memoMap).forEach(({ m, el }) => {
+    const sc = svgToScreen(m.svgX, m.svgY);
+    el.style.left = (sc.x - MEMO_W / 2) + 'px';
+    el.style.top  = (sc.y - MEMO_H / 2) + 'px';
+  });
+  updateStrings();
+}
+
+// ── Pan & Pinch ──
+let isPanning = false, panStart = {x:0,y:0}, panBase = {x:0,y:0}, pinch = null;
+
+boardWrap.addEventListener('mousedown', e => {
+  if (e.target.closest('.memo-card')) return;
+  isPanning = true;
+  panStart  = { x: e.clientX, y: e.clientY };
+  panBase   = { x: panX, y: panY };
+  boardWrap.style.cursor = 'grabbing';
+});
+window.addEventListener('mousemove', e => {
+  if (!isPanning) return;
+  panX = panBase.x + e.clientX - panStart.x;
+  panY = panBase.y + e.clientY - panStart.y;
+  applyTransform(); repositionMemos();
+});
+window.addEventListener('mouseup', () => { isPanning = false; boardWrap.style.cursor = ''; });
+
+boardWrap.addEventListener('wheel', e => {
+  e.preventDefault();
+  const f = e.deltaY < 0 ? 1.1 : 0.9;
+  const r = boardWrap.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  scale = Math.max(0.15, Math.min(6, scale * f));
+  panX  = mx - (mx - panX) * f;
+  panY  = my - (my - panY) * f;
+  applyTransform(); repositionMemos();
+}, { passive: false });
+
+boardWrap.addEventListener('touchstart', e => {
+  const onMemo = Array.from(e.touches).some(t =>
+    document.elementFromPoint(t.clientX, t.clientY)?.closest('.memo-card')
+  );
+  if (onMemo) return;
+  const ts = Array.from(e.touches);
+  if (ts.length === 1) {
+    isPanning = true;
+    panStart  = { x: ts[0].clientX, y: ts[0].clientY };
+    panBase   = { x: panX, y: panY };
+    pinch     = null;
+  } else if (ts.length === 2) {
+    isPanning = false;
+    const r   = boardWrap.getBoundingClientRect();
+    const mx0 = (ts[0].clientX + ts[1].clientX) / 2 - r.left;
+    const my0 = (ts[0].clientY + ts[1].clientY) / 2 - r.top;
+    pinch = {
+      dist0: Math.hypot(ts[0].clientX - ts[1].clientX, ts[0].clientY - ts[1].clientY),
+      scale0: scale, panX0: panX, panY0: panY, midX0: mx0, midY0: my0
+    };
+  }
+  e.preventDefault();
+}, { passive: false });
+
+boardWrap.addEventListener('touchmove', e => {
+  const onMemo = Array.from(e.touches).some(t =>
+    document.elementFromPoint(t.clientX, t.clientY)?.closest('.memo-card')
+  );
+  if (onMemo) return;
+  const ts = Array.from(e.touches);
+  if (ts.length === 1 && isPanning && !pinch) {
+    panX = panBase.x + ts[0].clientX - panStart.x;
+    panY = panBase.y + ts[0].clientY - panStart.y;
+    applyTransform(); repositionMemos();
+  } else if (ts.length === 2 && pinch) {
+    const r    = boardWrap.getBoundingClientRect();
+    const dist = Math.hypot(ts[0].clientX - ts[1].clientX, ts[0].clientY - ts[1].clientY);
+    const mx   = (ts[0].clientX + ts[1].clientX) / 2 - r.left;
+    const my   = (ts[0].clientY + ts[1].clientY) / 2 - r.top;
+    const ns   = Math.max(0.15, Math.min(6, pinch.scale0 * dist / pinch.dist0));
+    panX  = pinch.panX0 + mx - pinch.midX0 - (pinch.midX0 - pinch.panX0) * (ns / pinch.scale0 - 1);
+    panY  = pinch.panY0 + my - pinch.midY0 - (pinch.midY0 - pinch.panY0) * (ns / pinch.scale0 - 1);
+    scale = ns;
+    applyTransform(); repositionMemos();
+  }
+  e.preventDefault();
+}, { passive: false });
+
+boardWrap.addEventListener('touchend', e => {
+  if (e.touches.length === 0) { isPanning = false; pinch = null; }
+  else if (e.touches.length === 1) { pinch = null; }
+}, { passive: true });
+
+function zoomAt(f) {
+  const cx = boardWrap.clientWidth / 2, cy = boardWrap.clientHeight / 2;
+  scale = Math.max(0.15, Math.min(6, scale * f));
+  panX  = cx - (cx - panX) * f;
+  panY  = cy - (cy - panY) * f;
+  applyTransform(); repositionMemos();
+}
+document.getElementById('zoom-in-btn').onclick  = () => zoomAt(1.25);
+document.getElementById('zoom-out-btn').onclick = () => zoomAt(0.8);
+document.getElementById('reset-btn').onclick    = () => { fitBoard(); repositionMemos(); };
+
+// ── 실 연결 ──
+function updateStrings() {
+  const byAuthor = {};
+  Object.values(memoMap).forEach(({ m }) => {
+    if (!byAuthor[m.author]) byAuthor[m.author] = [];
+    byAuthor[m.author].push(m);
+  });
+  let html = '';
+  Object.values(byAuthor).forEach(pts => {
+    if (pts.length < 2) return;
+    pts.sort((a, b) => a.ts < b.ts ? -1 : 1);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i+1];
+      const mx = (a.svgX + b.svgX) / 2, my = (a.svgY + b.svgY) / 2 + 30;
+      const sw = Math.max(0.4, 1.5 / scale).toFixed(2);
+      html += `<path d="M${a.svgX},${a.svgY} Q${mx},${my} ${b.svgX},${b.svgY}" fill="none" stroke="${a.color}" stroke-width="${sw}" opacity="0.6"/>`;
+    }
+  });
+  stringSvg.innerHTML = html;
+}
+
+// ── 메모 생성 ──
+function makeMemo(m) {
+  if (memoMap[m.id]) return;
+  const sc    = svgToScreen(m.svgX, m.svgY);
+  const el    = document.createElement('div');
+  const isOwn = ownMemoIds.has(m.id);
+  el.className  = 'memo-card';
+  el.dataset.id = m.id;
+  el.style.cssText = `width:${MEMO_W}px;left:${sc.x-MEMO_W/2}px;top:${sc.y-MEMO_H/2}px;transform:rotate(${m.angle}deg);z-index:${20+(memoOrder%30)};`;
+  el.innerHTML = `
+    <div class="memo-pin" style="background:${m.color}"></div>
+    <div class="memo-paper" style="min-height:${MEMO_H*0.75}px">
+      ${isOwn ? '<button class="memo-del">×</button>' : ''}
+      <div class="memo-text">${escHtml(m.text)}</div>
+      <div class="memo-author">${escHtml(m.author)}</div>
+    </div>`;
+  if (isOwn) {
+    el.querySelector('.memo-del').addEventListener('click', ev => { ev.stopPropagation(); deleteMemo(m.id); });
+    el.addEventListener('dblclick', () => startEdit(el, m));
+  }
+  makeDraggable(el, m, isOwn);
+  memoLayer.appendChild(el);
+  memoMap[m.id] = { m, el };
+  memoOrder++;
+  updateStrings();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ── 드래그 ──
+function makeDraggable(el, m, isOwn) {
+  let startCX, startCY, startSX, startSY, moved;
+
+  function onStart(cx, cy) {
+    const sc = svgToScreen(m.svgX, m.svgY);
+    startCX = cx; startCY = cy;
+    startSX = sc.x; startSY = sc.y;
+    moved   = false;
+    el.style.zIndex = 200;
+  }
+  function onMove(cx, cy) {
+    const dx = cx - startCX, dy = cy - startCY;
+    if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+    const newSX = startSX + dx, newSY = startSY + dy;
+    el.style.left = (newSX - MEMO_W/2) + 'px';
+    el.style.top  = (newSY - MEMO_H/2) + 'px';
+    const sv = screenToSvg(newSX, newSY);
+    m.svgX = sv.x; m.svgY = sv.y;
+    updateStrings();
+  }
+  function onEnd() {
+    el.style.zIndex = 20 + (memoOrder % 30);
+    if (moved && isOwn && CONFIGURED) {
+      SB.update(m.id, { svgX: +m.svgX.toFixed(2), svgY: +m.svgY.toFixed(2) }).catch(() => {});
+    }
+  }
+
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('memo-del')) return;
+    e.preventDefault(); e.stopPropagation();
+    onStart(e.clientX, e.clientY);
+    const mm = ev => onMove(ev.clientX, ev.clientY);
+    const mu = () => { onEnd(); window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu); };
+    window.addEventListener('mousemove', mm);
+    window.addEventListener('mouseup', mu);
+  });
+
+  el.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    e.stopPropagation();
+    onStart(e.touches[0].clientX, e.touches[0].clientY);
+    const tm = ev => { ev.preventDefault(); ev.stopPropagation(); onMove(ev.touches[0].clientX, ev.touches[0].clientY); };
+    const te = () => { onEnd(); el.removeEventListener('touchmove', tm); el.removeEventListener('touchend', te); };
+    el.addEventListener('touchmove', tm, { passive: false });
+    el.addEventListener('touchend',  te, { passive: true });
+  }, { passive: true });
+
+  // 모바일 더블탭 수정
+  if (isOwn) {
+    let lastTap = 0;
+    el.addEventListener('touchend', e => {
+      if (e.changedTouches.length !== 1) return;
+      const now = Date.now();
+      if (now - lastTap < 350) startEdit(el, m);
+      lastTap = now;
+    }, { passive: true });
+  }
+}
+
+// ── 수정 / 삭제 ──
+function startEdit(el, m) {
+  const textEl = el.querySelector('.memo-text');
+  if (textEl.querySelector('textarea')) return;
+  const orig = m.text;
+  textEl.innerHTML = '';
+  const ta = document.createElement('textarea');
+  ta.className = 'memo-edit-area';
+  ta.value = orig;
+  textEl.appendChild(ta);
+  ta.focus();
+  ta.addEventListener('blur', () => {
+    const newText = ta.value.trim() || orig;
+    m.text = newText;
+    textEl.innerHTML = escHtml(newText);
+    if (CONFIGURED) SB.update(m.id, { text: newText }).catch(() => {});
+  });
+}
+
+async function deleteMemo(id) {
+  if (!confirm('이 메모를 삭제할까요?')) return;
+  const entry = memoMap[id];
+  if (entry) { entry.el.remove(); delete memoMap[id]; }
+  ownMemoIds.delete(id);
+  updateStrings();
+  if (CONFIGURED) SB.remove(id).catch(() => {});
+}
+
+// ── 헬퍼 ──
+function randAngle() {
+  return +(Math.random() * 30 - 15).toFixed(2);
+}
+function randCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({ length: 5 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+const FLOORS = [
+  {top:68,bot:148},{top:148,bot:288},{top:338,bot:468},{top:468,bot:618},
+  {top:618,bot:868},{top:868,bot:1048},{top:1048,bot:1248},{top:1248,bot:1328},{top:1328,bot:1510}
+];
+function randPos(idx) {
+  const f = FLOORS[idx % FLOORS.length];
+  return { svgX: 90 + Math.random() * 500, svgY: f.top + (f.bot-f.top)*0.15 + Math.random()*(f.bot-f.top)*0.7 };
+}
+
+// ── 토스트 ──
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.style.opacity = '0', 2500);
+}
+
+// ── 타이머 ──
+function startTimer(createdAt) {
+  if (timerStarted) return;
+  timerStarted = true;
+  const timerEl = document.getElementById('timer-txt');
+  function tick() {
+    const left = THREE_HOURS - (Date.now() - createdAt);
+    if (left <= 0) { timerEl.textContent = '만료됨'; timerEl.style.color = '#c0392b'; return; }
+    const h = Math.floor(left / 3600000);
+    const m = Math.floor((left % 3600000) / 60000);
+    const s = Math.floor((left % 60000) / 1000);
+    timerEl.textContent = `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    timerEl.style.color = left < 300000 ? '#c0392b' : left < 600000 ? '#e67e22' : '#b8b4a9';
+    setTimeout(tick, 1000);
+  }
+  tick();
+}
+
+// ── 동기화 (삭제 반영 + 위치/텍스트 업데이트 포함) ──
+async function syncAll() {
+  if (!CONFIGURED) { toast('Supabase 미설정 — 공유 불가'); return; }
+  try {
+    const rows  = await SB.read(roomCode);
+    const dbIds = new Set(rows.map(r => String(r.id)));
+
+    // DB에서 지워진 남의 메모를 로컬에서도 제거
+    Object.keys(memoMap).forEach(id => {
+      if (!dbIds.has(id) && !ownMemoIds.has(id)) {
+        memoMap[id].el.remove();
+        delete memoMap[id];
+      }
+    });
+
+    let added = 0;
+    rows.forEach(row => {
+      const m = {
+        id: String(row.id), room: row.room, author: row.author,
+        color: row.color, text: row.text,
+        angle: parseFloat(row.angle) || 0,
+        svgX:  parseFloat(row.svgX)  || 340,
+        svgY:  parseFloat(row.svgY)  || 700,
+        ts:    row.ts
+      };
+      if (!timerStarted && row.ts) startTimer(new Date(row.ts).getTime());
+      if (!memoMap[m.id]) {
+        makeMemo(m); added++;
+      } else {
+        // 다른 사람이 이동하거나 수정한 내용 반영
+        const entry = memoMap[m.id];
+        entry.m.svgX = m.svgX; entry.m.svgY = m.svgY; entry.m.text = m.text;
+        const sc = svgToScreen(m.svgX, m.svgY);
+        entry.el.style.left = (sc.x - MEMO_W/2) + 'px';
+        entry.el.style.top  = (sc.y - MEMO_H/2) + 'px';
+        const textEl = entry.el.querySelector('.memo-text');
+        if (textEl && !textEl.querySelector('textarea')) textEl.innerHTML = escHtml(m.text);
+      }
+    });
+    updateStrings();
+    toast(added > 0 ? `${added}개의 새 메모가 공개됐어요!` : '동기화 완료');
+  } catch (e) {
+    toast('동기화 실패 — 인터넷 연결을 확인해주세요');
+  }
+}
+
+// ── 스크린샷 (SVG 직렬화, 외부 라이브러리 불필요) ──
+document.getElementById('shot-btn').onclick = async () => {
+  toast('캡처 중...');
+  try {
+    const ns  = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('xmlns', ns);
+    svg.setAttribute('viewBox', `0 0 ${SVG_W} ${SVG_H}`);
+    svg.setAttribute('width',  String(SVG_W * 2));
+    svg.setAttribute('height', String(SVG_H * 2));
+
+    // 호텔 맵
+    Array.from(document.getElementById('hotel-svg').childNodes)
+      .forEach(n => svg.appendChild(n.cloneNode(true)));
+    // 실 연결
+    Array.from(stringSvg.childNodes)
+      .forEach(n => svg.appendChild(n.cloneNode(true)));
+    // 메모 카드
+    Object.values(memoMap).forEach(({ m }) => {
+      const g = document.createElementNS(ns, 'g');
+      g.setAttribute('transform', `translate(${m.svgX},${m.svgY}) rotate(${m.angle})`);
+      const rect = document.createElementNS(ns, 'rect');
+      rect.setAttribute('x','-35'); rect.setAttribute('y','-26');
+      rect.setAttribute('width','70'); rect.setAttribute('height','52');
+      rect.setAttribute('fill','rgba(242,238,224,0.92)');
+      g.appendChild(rect);
+      const pin = document.createElementNS(ns, 'circle');
+      pin.setAttribute('cx','0'); pin.setAttribute('cy','-30');
+      pin.setAttribute('r','4'); pin.setAttribute('fill', m.color);
+      g.appendChild(pin);
+      m.text.split('\n').slice(0, 5).forEach((line, i) => {
+        const t = document.createElementNS(ns, 'text');
+        t.setAttribute('x','-30'); t.setAttribute('y', String(-14 + i * 9));
+        t.setAttribute('font-size','7'); t.setAttribute('fill','#1a1814');
+        t.setAttribute('font-family','monospace');
+        t.textContent = line.slice(0, 20);
+        g.appendChild(t);
+      });
+      const auth = document.createElementNS(ns, 'text');
+      auth.setAttribute('x','32'); auth.setAttribute('y','22');
+      auth.setAttribute('font-size','5'); auth.setAttribute('fill','#888');
+      auth.setAttribute('text-anchor','end'); auth.setAttribute('font-family','monospace');
+      auth.textContent = m.author;
+      g.appendChild(auth);
+      svg.appendChild(g);
+    });
+
+    const svgStr = new XMLSerializer().serializeToString(svg);
+    const blob   = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url    = URL.createObjectURL(blob);
+
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = SVG_W * 2; canvas.height = SVG_H * 2;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#080808';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        const a = document.createElement('a');
+        a.href     = canvas.toDataURL('image/png');
+        a.download = `SNM_${roomCode}_${new Date().toISOString().slice(0,10)}.png`;
+        a.click();
+        resolve();
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(); };
+      img.src = url;
+    });
+    toast('저장 완료!');
+  } catch (e) {
+    toast('캡처 실패');
+  }
+};
+
+// ── 셋업 ──
+document.addEventListener('DOMContentLoaded', () => {
+  // URL 파라미터로 방 코드 자동 입력 (?room=XXXXX)
+  const urlRoom = new URLSearchParams(location.search).get('room');
+  if (urlRoom) document.getElementById('room-input').value = urlRoom.toUpperCase().slice(0, 5);
+
+  // 핀 색상 그리드
+  const grid = document.getElementById('pin-grid');
+  let selectedPin = 0;
+  PIN_COLORS.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'pin-opt' + (i === 0 ? ' selected' : '');
+    d.style.background = c;
+    d.onclick = () => {
+      document.querySelectorAll('.pin-opt').forEach(x => x.classList.remove('selected'));
+      d.classList.add('selected');
+      selectedPin = i;
+    };
+    grid.appendChild(d);
+  });
+
+  document.getElementById('room-gen-btn').onclick = () => {
+    document.getElementById('room-input').value = randCode();
+  };
+  document.getElementById('room-input').addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  });
+
+  document.getElementById('enter-btn').onclick = async () => {
+    const errEl = document.getElementById('setup-err');
+    const room  = document.getElementById('room-input').value.trim().toUpperCase();
+    const nick  = document.getElementById('nick-input').value.trim();
+    errEl.textContent = '';
+    if (!room) { errEl.textContent = '방 코드를 입력하세요'; return; }
+    if (!nick) { errEl.textContent = '닉네임을 입력하세요'; return; }
+
+    roomCode = room;
+    user     = { nick, color: PIN_COLORS[selectedPin] };
+
+    document.getElementById('setup').style.display      = 'none';
+    document.getElementById('toolbar').style.display    = 'flex';
+    document.getElementById('tb-pin').style.background  = user.color;
+    document.getElementById('tb-name').textContent      = user.nick;
+    document.getElementById('tb-room').textContent      = `# ${roomCode}`;
+    document.getElementById('compose-user').textContent = user.nick;
+
+    fitBoard();
+    await syncAll();
+    if (!timerStarted) startTimer(Date.now());
+  };
+
+  document.getElementById('add-btn').onclick = () => {
+    document.getElementById('compose').style.display = 'block';
+    document.getElementById('compose-text').focus();
+  };
+  document.getElementById('c-cancel').onclick = () => {
+    document.getElementById('compose').style.display = 'none';
+    document.getElementById('compose-text').value    = '';
+  };
+  document.getElementById('c-submit').onclick = async () => {
+    const text = document.getElementById('compose-text').value.trim();
+    if (!text) return;
+    const pos = randPos(Object.keys(memoMap).length);
+    const id  = (crypto.randomUUID?.() ?? (Date.now().toString(36) + Math.random().toString(36).slice(2)));
+    const m   = {
+      id, room: roomCode, author: user.nick, color: user.color, text,
+      angle: randAngle(),
+      svgX:  +pos.svgX.toFixed(2),
+      svgY:  +pos.svgY.toFixed(2),
+      ts:    new Date().toISOString()
+    };
+    ownMemoIds.add(id);
+    makeMemo(m);
+    document.getElementById('compose').style.display = 'none';
+    document.getElementById('compose-text').value    = '';
+    if (!timerStarted) startTimer(Date.now());
+    if (CONFIGURED) {
+      try {
+        await SB.insert(m);
+        toast('메모가 보드에 꽂혔어요!');
+      } catch (e) {
+        toast('저장 실패 — 나중에 동기화해주세요');
+      }
+    } else {
+      toast('메모 추가됨 (공유 미설정)');
+    }
+  };
+
+  document.getElementById('sync-btn').onclick = syncAll;
+});
+</script>
+</body>
+</html>
