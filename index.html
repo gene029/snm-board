@@ -63,6 +63,12 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
   font-size:13px;padding:10px;cursor:pointer;letter-spacing:2px;
 }
 .btn-enter:hover{background:rgba(232,228,217,0.08)}
+.help-link{
+  display:block;width:100%;background:none;border:none;
+  color:#787468;font-family:'Courier New',monospace;
+  font-size:10px;letter-spacing:1px;padding:10px 0 0;cursor:pointer;text-align:center;
+}
+.help-link:hover{color:#e8e4d9}
 .setup-err{color:#c0392b;font-size:11px;margin-bottom:10px;min-height:16px}
 
 #toolbar{
@@ -107,10 +113,14 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 .memo-paper{
   background:rgba(242,238,224,0.92);padding:3px 8px 13px;position:relative;
   font-family:'Courier New',monospace;font-size:11px;line-height:1.5;color:#1a1814;
-  word-break:break-all;white-space:pre-wrap;box-shadow:2px 3px 10px rgba(0,0,0,0.5);
+  word-break:break-all;box-shadow:2px 3px 10px rgba(0,0,0,0.5);
 }
+/* white-space:pre-wrap는 .memo-paper 전체가 아니라 실제 본문(.memo-text)에만 걸어야 함 —
+   .memo-paper에 걸려있으면 카드 마크업 안의 줄바꿈/들여쓰기(빈 태그 자리 등)까지 전부
+   빈 줄로 렌더링돼서 본문 위에 마진이 크게 남는 버그가 있었음 */
+.memo-text{white-space:pre-wrap}
 .memo-author{position:absolute;bottom:2px;right:6px;font-size:9px;color:#888;letter-spacing:1px}
-.memo-tags{position:absolute;top:3px;left:5px;display:flex;gap:2px;flex-wrap:wrap;max-width:52px}
+.memo-tags{display:flex;gap:2px;flex-wrap:wrap;margin-bottom:3px;padding-right:14px}
 .memo-tag{font-size:7px;line-height:1.4;background:rgba(0,0,0,0.1);color:#5a5650;padding:1px 3px;border-radius:2px;white-space:nowrap}
 .memo-tag.ooo-badge{background:#e8c25a;color:#1a1814;font-weight:bold}
 .memo-paper.ooo{box-shadow:0 0 0 2px #e8c25a,0 0 14px 2px rgba(232,194,90,0.55),2px 3px 10px rgba(0,0,0,0.5)}
@@ -207,6 +217,26 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
   font-size:11px;text-align:center;padding:6px;z-index:3000;letter-spacing:1px;display:none;
 }
 
+/* ── 사용설명서 오버레이 ── */
+#help-overlay{
+  position:fixed;inset:0;background:rgba(8,8,8,0.98);z-index:2500;display:none;
+  flex-direction:column;padding:16px;overflow-y:auto;
+}
+#help-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+#help-header h2{flex:1;color:#e8e4d9;font-size:14px;font-weight:400;letter-spacing:1px;font-family:Georgia,serif}
+#help-header button{
+  background:transparent;border:1px solid #555;color:#e8e4d9;
+  font-family:'Courier New',monospace;font-size:11px;padding:6px 12px;cursor:pointer;
+}
+#help-header button:hover{border-color:#e8e4d9}
+#help-body{max-width:560px;margin:0 auto;width:100%;color:#d8d4c9;font-family:'Courier New',monospace;font-size:12px;line-height:1.7;padding-bottom:40px}
+#help-body h3{color:#e8c25a;font-size:12px;letter-spacing:1px;margin:22px 0 8px;font-family:Georgia,serif}
+#help-body h3:first-of-type{margin-top:6px}
+#help-body p{margin-bottom:10px}
+#help-body ul,#help-body ol{margin:0 0 10px 20px}
+#help-body li{margin-bottom:6px}
+#help-body strong{color:#e8e4d9}
+#help-body .help-note{color:#c9a24a;font-size:11px;border-left:2px solid #7a5a1e;padding-left:10px}
 /* ── 인물별 모아보기 오버레이 ── */
 #gallery-overlay{
   position:fixed;inset:0;background:rgba(8,8,8,0.98);z-index:1500;display:none;
@@ -237,11 +267,11 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 .gallery-card{
   background:rgba(242,238,224,0.92);padding:10px 12px;margin-bottom:12px;position:relative;
   font-family:'Courier New',monospace;font-size:12px;line-height:1.6;color:#1a1814;
-  white-space:pre-wrap;word-break:break-all;box-shadow:2px 3px 10px rgba(0,0,0,0.5);
+  word-break:break-all;box-shadow:2px 3px 10px rgba(0,0,0,0.5);
 }
 .gallery-card.ooo{box-shadow:0 0 0 2px #e8c25a,0 0 14px 2px rgba(232,194,90,0.5),2px 3px 10px rgba(0,0,0,0.5)}
 .gc-pin{position:absolute;top:-7px;left:14px;width:14px;height:14px;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.6)}
-.gc-text{margin-bottom:8px}
+.gc-text{margin-bottom:8px;white-space:pre-wrap}
 .gc-meta{display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-size:9px;color:#888}
 .gc-author{margin-right:auto;letter-spacing:0.5px}
 </style>
@@ -269,6 +299,7 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
     <div class="pin-grid" id="pin-grid"></div>
     <p class="setup-err" id="setup-err"></p>
     <button class="btn-enter" id="enter-btn">입장 →</button>
+    <button class="help-link" id="help-btn-setup">📖 사용설명서 보기</button>
   </div>
 </div>
 
@@ -285,7 +316,81 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
   <button class="tb-btn" id="reset-btn">⊙</button>
   <button class="tb-btn" id="shot-btn">📷</button>
   <button class="tb-btn" id="gallery-btn">👤 인물</button>
+  <button class="tb-btn" id="export-btn">💾 오프라인 저장</button>
+  <button class="tb-btn" id="help-btn">📖 설명서</button>
   <button class="tb-btn" id="sync-btn">↻ 전체 공개</button>
+</div>
+
+<div id="help-overlay">
+  <div id="help-header">
+    <h2>사용설명서</h2>
+    <button id="help-close">닫기 ×</button>
+  </div>
+  <div id="help-body">
+    <p>Sleep No More Seoul을 함께 본 사람들끼리 각자의 경험을 한 보드에 모아서, 등장인물별로 정리하고 서로 연결해보는 공유 수사보드입니다.</p>
+
+    <h3>1. 입장하기</h3>
+    <ol>
+      <li><strong>방 코드</strong>를 입력하거나 "랜덤 생성"으로 새 코드를 만듭니다. 같은 방 코드로 들어온 사람끼리만 메모를 공유합니다.</li>
+      <li><strong>닉네임</strong>을 입력합니다.</li>
+      <li><strong>핀 색상</strong>을 하나 고릅니다 — 내가 쓴 메모는 이 색으로 표시됩니다.</li>
+      <li>"입장 →"을 누르면 보드로 들어갑니다.</li>
+    </ol>
+    <p class="help-note">⚠️ 방은 첫 메모가 올라온 지 <strong>3시간이 지나면 자동으로 삭제</strong>됩니다. 화면 위쪽 타이머로 남은 시간을 확인할 수 있어요.</p>
+
+    <h3>2. 화면 조작</h3>
+    <ul>
+      <li><strong>드래그(빈 공간)</strong>: 보드를 이리저리 움직입니다.</li>
+      <li><strong>＋ / － 버튼, 스크롤/핀치</strong>: 확대·축소합니다.</li>
+      <li><strong>⊙ 버튼</strong>: 화면을 원래 위치로 되돌립니다.</li>
+    </ul>
+
+    <h3>3. 메모 남기기</h3>
+    <ol>
+      <li>상단 "+ 메모" 버튼을 누릅니다.</li>
+      <li>경험한 내용을 텍스트로 적습니다.</li>
+      <li><strong>인물 태그</strong>를 달아보세요 — 검색창에 이름을 치거나, 그룹(마녀·호텔직원 / 맥베스 스토리 / 갤로우 그린 마을 / 킹 제임스 요양병원)을 펼쳐서 골라도 됩니다. 여러 명 동시 태그 가능.</li>
+      <li>특정 인물과 <strong>1:1로 특별한 인터랙션</strong>을 했다면 "⭐ 원온원(One on One)"에 체크하세요. 금색 테두리로 눈에 띄게 표시됩니다.</li>
+      <li>"핀으로 꽂기"를 누르면 완료.</li>
+    </ol>
+
+    <h3>4. 메모 고치기 / 지우기</h3>
+    <ul>
+      <li><strong>더블클릭(또는 더블탭)</strong>: 내가 쓴 메모를 다시 열어서 텍스트·태그·원온원을 전부 다시 편집할 수 있습니다.</li>
+      <li><strong>메모에 마우스를 올리면 나오는 × 버튼</strong>: 삭제합니다.</li>
+      <li><strong>자기 메모만</strong> 옮기거나 고치거나 지울 수 있습니다.</li>
+    </ul>
+
+    <h3>5. 메모끼리 실로 잇기</h3>
+    <ul>
+      <li>메모 위쪽의 <strong>동그란 핀을 누른 채로 드래그</strong>해서 다른 메모까지 끌고 가면 실이 이어집니다.</li>
+      <li>이미 그어진 <strong>실을 클릭</strong>하면 끊을 수 있습니다.</li>
+      <li>연결은 작성자와 상관없이 누구나 만들고 끊을 수 있어요.</li>
+    </ul>
+
+    <h3>6. 인물별로 모아보기</h3>
+    <ol>
+      <li>상단 "👤 인물" 버튼을 누릅니다.</li>
+      <li>등장인물 타일을 클릭하면 그 인물이 태그된 메모만 모아볼 수 있어요 (타일마다 개수 표시).</li>
+      <li>"⭐ 원온원" 타일은 인물 상관없이 원온원 메모만 모아줍니다.</li>
+      <li>상세 화면에서 "📷 저장"을 누르면 그 인물의 메모 모음을 이미지로 저장할 수 있습니다.</li>
+    </ol>
+
+    <h3>7. 다 같이 최신 상태로 맞추기</h3>
+    <p>다른 사람 메모가 자동으로 바로 안 보일 수 있어요. 상단 <strong>"↻ 전체 공개"</strong>로 최신화하세요.</p>
+
+    <h3>8. 보드 전체를 이미지로 저장하기</h3>
+    <p>상단 <strong>📷 버튼</strong>으로 보드 전체(메모+연결선 포함)를 이미지로 저장합니다.</p>
+
+    <h3>9. 인터넷 없이도 보고 싶을 때 — 오프라인 저장</h3>
+    <p>상단 <strong>"💾 오프라인 저장"</strong>을 누르면 그 순간의 메모+배경 애니메이션이 담긴 파일이 다운로드됩니다. 인터넷 없이 열어도 되고 인물별 모아보기도 그대로 동작해요. 단, 이 안의 메모는 스냅샷이라 더 이상 수정/추가는 안 됩니다.</p>
+
+    <h3>참고</h3>
+    <ul>
+      <li>방이 만료되면 안의 모든 내용이 복구 불가로 사라집니다. 소중한 기록은 8, 9번으로 미리 저장해두세요.</li>
+      <li>태그는 등장인물 20명(벨홉·제3간호사는 하나로 묶임) + 원온원 특수 표시로 구성돼 있어요.</li>
+    </ul>
+  </div>
 </div>
 
 <div id="gallery-overlay">
@@ -1068,7 +1173,7 @@ html,body{background:#080808;height:100%;overflow:hidden;font-family:'Courier Ne
 </div>
 
 <div id="compose">
-  <h3>새 메모 — <span id="compose-user"></span></h3>
+  <h3><span id="compose-mode">새 메모</span> — <span id="compose-user"></span></h3>
   <textarea id="compose-text" placeholder="여기에 경험을 기록하세요..."></textarea>
 
   <div id="tag-picker">
@@ -1122,10 +1227,10 @@ const MEMO_H_SVG  = 70;  // 메모지 세로 (SVG 좌표계 기준)
 
 // ── 등장인물 태그 (20명, 스토리라인별 그룹) ──
 const GROUPS = [
-  { id:'spirit',  label:'마녀 · 정령', chars:['hecate','fate','bold','boy','porter'] },
-  { id:'court',   label:'맥베스 가문 · 궁정', chars:['macbeth','lady_macbeth','king_duncan','banquo','lady_macduff','macduff','malcolm'] },
+  { id:'spirit',  label:'마녀 · 호텔직원', chars:['hecate','fate','bold','boy','porter','catherine'] },
+  { id:'court',   label:'맥베스 스토리', chars:['macbeth','lady_macbeth','king_duncan','banquo','lady_macduff','macduff','malcolm'] },
   { id:'town',    label:'갤로우 그린 마을', chars:['agnes','fulton','bagarran','bartender'] },
-  { id:'hospital',label:'킹 제임스 요양병원', chars:['catherine','matron_lang','christian_shaw','bellhop_nurse'] },
+  { id:'hospital',label:'킹 제임스 요양병원', chars:['matron_lang','christian_shaw','bellhop_nurse'] },
 ];
 const CHARACTERS = {
   hecate:         { ko:'헤카테',            en:'Hecate' },
@@ -1285,8 +1390,9 @@ function openGalleryDetail(filterKey, title) {
 
 function closeGalleryDetail() {
   galleryFilter = null;
-  document.getElementById('gallery-back').style.display  = 'none';
-  document.getElementById('gallery-save').style.display  = 'none';
+  document.getElementById('gallery-title').textContent    = '인물별 모아보기'; // 이전에 본 캐릭터 이름이 안 남게 리셋
+  document.getElementById('gallery-back').style.display   = 'none';
+  document.getElementById('gallery-save').style.display    = 'none';
   document.getElementById('gallery-detail').style.display = 'none';
   document.getElementById('gallery-tiles').style.display  = 'block';
   renderGalleryTiles(); // 카운트 갱신
@@ -1376,6 +1482,360 @@ function saveGalleryShot(filterKey, title) {
   toast('저장 완료!');
 }
 
+// ── Tier C: 오프라인 standalone HTML 내보내기 ──
+// 메모는 그 시점 스냅샷으로 고정(드래그·편집·연결 불가), 인물별 모아보기 필터만 인터넷 없이도 동작.
+// __offlineGalleryApp은 이 페이지에서 직접 실행되지 않고 .toString()으로 소스만 뽑아서
+// 내보낸 HTML 안에 심는 용도 — 그래서 바깥 스코프(CHARACTERS, memoMap 등)에 의존하지 않고
+// 필요한 데이터를 전부 인자로 받아 자기 안에서 완결되게 짜여있음.
+function __offlineGalleryApp(MEMOS, CHARACTERS, GROUPS, ROOM_CODE, EXPORT_DATE) {
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+  function tagAbbrev(id) { return ((CHARACTERS[id] && CHARACTERS[id].ko) || id).slice(0, 2); }
+
+  function tagCounts() {
+    const counts = {};
+    let oooCount = 0;
+    MEMOS.forEach(m => {
+      (m.tags || []).forEach(t => { counts[t] = (counts[t] || 0) + 1; });
+      if (m.oneOnOne) oooCount++;
+    });
+    return { counts, oooCount };
+  }
+
+  function renderGalleryTiles() {
+    const cnt  = tagCounts();
+    const wrap = document.getElementById('gallery-tiles');
+    let html = '<div class="gallery-group"><div class="gallery-group-label">특별</div><div class="gallery-grid">' +
+      '<button type="button" class="gallery-tile ooo-tile" data-special="ooo">' +
+      '<span class="gt-ko">⭐ 원온원</span><span class="gt-en">One on One</span><span class="gt-count">' + cnt.oooCount + '</span>' +
+      '</button></div></div>';
+    GROUPS.forEach(g => {
+      html += '<div class="gallery-group"><div class="gallery-group-label">' + escHtml(g.label) + '</div><div class="gallery-grid">';
+      g.chars.forEach(cid => {
+        const c = CHARACTERS[cid];
+        html += '<button type="button" class="gallery-tile" data-tag="' + cid + '">' +
+          '<span class="gt-ko">' + escHtml(c.ko) + '</span><span class="gt-en">' + escHtml(c.en) + '</span>' +
+          '<span class="gt-count">' + (cnt.counts[cid] || 0) + '</span></button>';
+      });
+      html += '</div></div>';
+    });
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('.gallery-tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        if (tile.dataset.special === 'ooo') openGalleryDetail('ooo', '⭐ 원온원 · One on One');
+        else openGalleryDetail(tile.dataset.tag, CHARACTERS[tile.dataset.tag].ko + ' · ' + CHARACTERS[tile.dataset.tag].en);
+      });
+    });
+  }
+
+  let galleryFilter = null;
+
+  function openGalleryDetail(filterKey, title) {
+    galleryFilter = filterKey;
+    document.getElementById('gallery-title').textContent   = title;
+    document.getElementById('gallery-back').style.display  = 'inline-block';
+    document.getElementById('gallery-save').style.display  = 'inline-block';
+    document.getElementById('gallery-tiles').style.display = 'none';
+    const detail = document.getElementById('gallery-detail');
+    detail.style.display = 'block';
+
+    const matched = MEMOS.filter(m => filterKey === 'ooo' ? m.oneOnOne : (m.tags || []).includes(filterKey));
+    if (!matched.length) {
+      detail.innerHTML = '<p class="gallery-empty">이 태그로 기록된 메모가 없어요.</p>';
+      return;
+    }
+    detail.innerHTML = matched.map(m =>
+      '<div class="gallery-card' + (m.oneOnOne ? ' ooo' : '') + '">' +
+        '<div class="gc-pin" style="background:' + m.color + '"></div>' +
+        '<div class="gc-text">' + escHtml(m.text) + '</div>' +
+        '<div class="gc-meta"><span class="gc-author">' + escHtml(m.author) + '</span>' +
+        (m.tags || []).map(t => '<span class="memo-tag">' + escHtml((CHARACTERS[t] && CHARACTERS[t].ko) || t) + '</span>').join('') +
+        (m.oneOnOne ? '<span class="memo-tag ooo-badge">⭐ One on One</span>' : '') +
+        '</div></div>'
+    ).join('');
+  }
+
+  function closeGalleryDetail() {
+    galleryFilter = null;
+    document.getElementById('gallery-title').textContent    = '인물별 모아보기';
+    document.getElementById('gallery-back').style.display   = 'none';
+    document.getElementById('gallery-save').style.display   = 'none';
+    document.getElementById('gallery-detail').style.display = 'none';
+    document.getElementById('gallery-tiles').style.display  = 'block';
+    renderGalleryTiles();
+  }
+
+  function saveGalleryShot(filterKey, title) {
+    if (!filterKey) return;
+    const matched = MEMOS.filter(m => filterKey === 'ooo' ? m.oneOnOne : (m.tags || []).includes(filterKey));
+    if (!matched.length) return;
+    const ns = 'http://www.w3.org/2000/svg';
+    const W = 640, cardH = 110, padTop = 70, padX = 24;
+    const H = padTop + matched.length * cardH + 24;
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('xmlns', ns);
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('width',  String(W * 2));
+    svg.setAttribute('height', String(H * 2));
+    const bg = document.createElementNS(ns, 'rect');
+    bg.setAttribute('width', W); bg.setAttribute('height', H); bg.setAttribute('fill', '#080808');
+    svg.appendChild(bg);
+    const titleEl = document.createElementNS(ns, 'text');
+    titleEl.setAttribute('x', W / 2); titleEl.setAttribute('y', 40);
+    titleEl.setAttribute('text-anchor', 'middle'); titleEl.setAttribute('fill', '#e8e4d9');
+    titleEl.setAttribute('font-family', 'Georgia, serif'); titleEl.setAttribute('font-size', '20');
+    titleEl.textContent = title;
+    svg.appendChild(titleEl);
+    matched.forEach((m, i) => {
+      const y = padTop + i * cardH;
+      const g = document.createElementNS(ns, 'g');
+      g.setAttribute('transform', 'translate(' + padX + ',' + y + ')');
+      const card = document.createElementNS(ns, 'rect');
+      card.setAttribute('width', W - padX * 2); card.setAttribute('height', cardH - 16);
+      card.setAttribute('fill', 'rgba(242,238,224,0.92)');
+      if (m.oneOnOne) { card.setAttribute('stroke', '#e8c25a'); card.setAttribute('stroke-width', '2'); }
+      g.appendChild(card);
+      const pin = document.createElementNS(ns, 'circle');
+      pin.setAttribute('cx', 14); pin.setAttribute('cy', 14); pin.setAttribute('r', 6);
+      pin.setAttribute('fill', m.color);
+      g.appendChild(pin);
+      m.text.split('\n').slice(0, 3).forEach((line, li) => {
+        const t = document.createElementNS(ns, 'text');
+        t.setAttribute('x', 30); t.setAttribute('y', 20 + li * 16);
+        t.setAttribute('font-size', 12); t.setAttribute('fill', '#1a1814');
+        t.setAttribute('font-family', 'Georgia, serif');
+        t.textContent = line.slice(0, 46);
+        g.appendChild(t);
+      });
+      const meta = document.createElementNS(ns, 'text');
+      meta.setAttribute('x', W - padX * 2 - 10); meta.setAttribute('y', cardH - 26);
+      meta.setAttribute('text-anchor', 'end'); meta.setAttribute('font-size', 10);
+      meta.setAttribute('fill', '#888'); meta.setAttribute('font-family', 'Georgia, serif');
+      meta.textContent = m.author + (m.oneOnOne ? ' · ⭐ One on One' : '');
+      g.appendChild(meta);
+      svg.appendChild(g);
+    });
+    const svgStr = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'SNM_' + ROOM_CODE + '_' + title.replace(/[^\w가-힣]+/g, '_') + '.svg';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // ── 보드 조회용 팬 · 핀치줌 (메모 이동/편집/연결은 없음 — 뷰어 전용 스냅샷) ──
+  const boardWrap = document.getElementById('board-wrap');
+  const board     = document.getElementById('board');
+  const hotelSvg  = document.getElementById('hotel-svg');
+  const SVG_W = parseFloat(hotelSvg.getAttribute('width')) || 680;
+  const vb    = (hotelSvg.getAttribute('viewBox') || '0 0 680 3620').split(' ');
+  const SVG_H = parseFloat(vb[3]) || 3620;
+  let scale = 1, panX = 0, panY = 0;
+
+  function applyTransform() { board.style.transform = 'translate(' + panX + 'px,' + panY + 'px) scale(' + scale + ')'; }
+  function fitBoard() {
+    const ww = boardWrap.clientWidth, wh = boardWrap.clientHeight;
+    scale = Math.min(ww / SVG_W, wh / SVG_H) * 0.95;
+    panX  = (ww - SVG_W * scale) / 2;
+    panY  = 10;
+    applyTransform();
+  }
+  function zoomAt(f) {
+    const cx = boardWrap.clientWidth / 2, cy = boardWrap.clientHeight / 2;
+    scale = Math.max(0.15, Math.min(6, scale * f));
+    panX  = cx - (cx - panX) * f;
+    panY  = cy - (cy - panY) * f;
+    applyTransform();
+  }
+
+  const activePointers = new Map();
+  let isPanning = false, panStart = {x:0,y:0}, panBase = {x:0,y:0}, pinch = null;
+  function pinchFromPointers() {
+    const pts = Array.from(activePointers.values());
+    if (pts.length !== 2) return null;
+    const r = boardWrap.getBoundingClientRect();
+    return {
+      dist0: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y),
+      scale0: scale, panX0: panX, panY0: panY,
+      midX0: (pts[0].x + pts[1].x) / 2 - r.left,
+      midY0: (pts[0].y + pts[1].y) / 2 - r.top
+    };
+  }
+  boardWrap.addEventListener('pointerdown', e => {
+    try { boardWrap.setPointerCapture(e.pointerId); } catch (err) {}
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (activePointers.size === 1) {
+      isPanning = true; panStart = { x: e.clientX, y: e.clientY }; panBase = { x: panX, y: panY }; pinch = null;
+      boardWrap.style.cursor = 'grabbing';
+    } else if (activePointers.size === 2) {
+      isPanning = false; pinch = pinchFromPointers();
+    }
+  });
+  window.addEventListener('pointermove', e => {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (activePointers.size === 1 && isPanning && !pinch) {
+      panX = panBase.x + e.clientX - panStart.x;
+      panY = panBase.y + e.clientY - panStart.y;
+      applyTransform();
+    } else if (activePointers.size === 2 && pinch) {
+      const pts  = Array.from(activePointers.values());
+      const r    = boardWrap.getBoundingClientRect();
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      const mx   = (pts[0].x + pts[1].x) / 2 - r.left;
+      const my   = (pts[0].y + pts[1].y) / 2 - r.top;
+      const ns   = Math.max(0.15, Math.min(6, pinch.scale0 * dist / pinch.dist0));
+      panX  = pinch.panX0 + mx - pinch.midX0 - (pinch.midX0 - pinch.panX0) * (ns / pinch.scale0 - 1);
+      panY  = pinch.panY0 + my - pinch.midY0 - (pinch.midY0 - pinch.panY0) * (ns / pinch.scale0 - 1);
+      scale = ns;
+      applyTransform();
+    }
+  });
+  function releasePointer(e) {
+    activePointers.delete(e.pointerId);
+    if (activePointers.size === 0) { isPanning = false; pinch = null; boardWrap.style.cursor = ''; }
+    else if (activePointers.size === 1) {
+      pinch = null;
+      const remaining = Array.from(activePointers.values())[0];
+      isPanning = true; panStart = { x: remaining.x, y: remaining.y }; panBase = { x: panX, y: panY };
+    }
+  }
+  window.addEventListener('pointerup',     releasePointer);
+  window.addEventListener('pointercancel', releasePointer);
+  boardWrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    const f  = e.deltaY < 0 ? 1.1 : 0.9;
+    const r  = boardWrap.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    scale = Math.max(0.15, Math.min(6, scale * f));
+    panX  = mx - (mx - panX) * f;
+    panY  = my - (my - panY) * f;
+    applyTransform();
+  }, { passive: false });
+
+  document.getElementById('zoom-in-btn').onclick  = () => zoomAt(1.25);
+  document.getElementById('zoom-out-btn').onclick = () => zoomAt(0.8);
+  document.getElementById('reset-btn').onclick    = fitBoard;
+  document.getElementById('gallery-btn').onclick  = () => {
+    renderGalleryTiles();
+    closeGalleryDetail();
+    document.getElementById('gallery-overlay').style.display = 'flex';
+  };
+  document.getElementById('gallery-close').onclick = () => {
+    document.getElementById('gallery-overlay').style.display = 'none';
+  };
+  document.getElementById('gallery-back').onclick  = closeGalleryDetail;
+  document.getElementById('gallery-save').onclick  = () => saveGalleryShot(galleryFilter, document.getElementById('gallery-title').textContent);
+
+  fitBoard();
+  window.addEventListener('resize', fitBoard);
+}
+
+function exportOfflineSnapshot() {
+  const memos = Object.values(memoMap).map(({ m }) => m);
+  if (!memos.length) { toast('내보낼 메모가 없어요'); return; }
+
+  const styleContent = document.querySelector('style').innerHTML;
+  const svgOuter      = document.getElementById('hotel-svg').outerHTML;
+  const exportDate    = new Date().toLocaleString('ko-KR');
+
+  const memoCardsHtml = memos.map(m => {
+    const tags = Array.isArray(m.tags) ? m.tags : [];
+    const tagsHtml = (tags.length || m.oneOnOne)
+      ? `<div class="memo-tags">${tags.map(t => `<span class="memo-tag">${escHtml(tagAbbrev(t))}</span>`).join('')}${m.oneOnOne ? '<span class="memo-tag ooo-badge">⭐</span>' : ''}</div>`
+      : '';
+    return `<div class="memo-card" style="width:${MEMO_W_SVG}px;left:${m.svgX-MEMO_W_SVG/2}px;top:${m.svgY-MEMO_H_SVG/2}px;transform:rotate(${m.angle}deg);z-index:20;">
+      <div class="memo-pin" style="background:${m.color}"></div>
+      <div class="memo-paper${m.oneOnOne ? ' ooo' : ''}">
+        ${tagsHtml}
+        <div class="memo-text">${escHtml(m.text)}</div>
+        <div class="memo-author">${escHtml(m.author)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const linkPathsHtml = Object.values(linksMap).map(link => {
+    const a = memoMap[link.from_id]?.m, b = memoMap[link.to_id]?.m;
+    if (!a || !b) return '';
+    const mx = (a.svgX + b.svgX) / 2, my = (a.svgY + b.svgY) / 2 + 30;
+    return `<path d="M${a.svgX},${a.svgY} Q${mx},${my} ${b.svgX},${b.svgY}" fill="none" stroke="${a.color}" stroke-width="1" opacity="0.65"></path>`;
+  }).join('');
+
+  // 메모 텍스트에 스크립트 종료 태그 문자열이 그대로 들어있으면 내보낸 파일이
+  // HTML 파서 단계에서 깨질 수 있어서, JSON 안의 '<' 문자를 전부 유니코드 이스케이프로 바꿔줌
+  const safe = s => s.replace(/</g, '\\u003C');
+  const memosJson = safe(JSON.stringify(memos.map(m => ({
+    id: m.id, author: m.author, color: m.color, text: m.text,
+    tags: m.tags || [], oneOnOne: !!m.oneOnOne
+  }))));
+  const charactersJson = safe(JSON.stringify(CHARACTERS));
+  const groupsJson     = safe(JSON.stringify(GROUPS));
+
+  const bootScript = `(${__offlineGalleryApp.toString()})(${memosJson}, ${charactersJson}, ${groupsJson}, ${JSON.stringify(roomCode)}, ${JSON.stringify(exportDate)});`;
+
+  const html = `<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>SNM 수사보드 — ${escHtml(roomCode)} 스냅샷</title>
+<style>
+${styleContent}
+#toolbar,#setup,#compose,#config-banner,.memo-del{display:none!important}
+.memo-card{pointer-events:none}
+#export-bar{position:fixed;top:0;left:0;width:100%;background:rgba(8,8,8,0.96);border-bottom:1px solid #222;padding:8px 14px;display:flex;align-items:center;gap:8px;z-index:100;flex-wrap:wrap}
+#export-bar .badge{color:#787468;font-size:10px;letter-spacing:1px}
+#export-bar button{background:transparent;border:1px solid #444;color:#e8e4d9;font-family:'Courier New',monospace;font-size:11px;padding:5px 10px;cursor:pointer}
+#export-bar button:hover{border-color:#e8e4d9}
+#board-wrap{position:absolute;top:37px;left:0;right:0;bottom:0;overflow:hidden}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="export-bar">
+  <span class="badge">SLEEP NO MORE · SEOUL — #${escHtml(roomCode)} 스냅샷 (오프라인) · ${escHtml(exportDate)}</span>
+  <button id="zoom-in-btn">＋</button>
+  <button id="zoom-out-btn">－</button>
+  <button id="reset-btn">⊙</button>
+  <button id="gallery-btn" style="margin-left:auto">👤 인물별 모아보기</button>
+</div>
+<div id="gallery-overlay">
+  <div id="gallery-header">
+    <button id="gallery-back" style="display:none">← 목록</button>
+    <h2 id="gallery-title">인물별 모아보기</h2>
+    <button id="gallery-save" style="display:none">📷 저장</button>
+    <button id="gallery-close">닫기 ×</button>
+  </div>
+  <div id="gallery-tiles"></div>
+  <div id="gallery-detail" style="display:none"></div>
+</div>
+<div id="board-wrap">
+  <div id="board">
+    ${svgOuter}
+    <svg id="string-svg" width="${SVG_W}" height="${SVG_H}" xmlns="http://www.w3.org/2000/svg">${linkPathsHtml}</svg>
+    <div id="memo-layer">${memoCardsHtml}</div>
+  </div>
+</div>
+</div>
+<script>
+${bootScript}
+<\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `SNM_${roomCode}_offline_${new Date().toISOString().slice(0,10)}.html`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('오프라인용 HTML로 저장됐어요!');
+}
+
 let user         = null;
 let roomCode     = '';
 let timerStarted = false;
@@ -1385,6 +1845,7 @@ let memoOrder = 0;
 const ownMemoIds = new Set();  // 이 세션에서 직접 작성한 메모 ID
 let linksMap  = {};   // id → { from_id, to_id, room, ts }
 let linkDraft = null; // 드래그로 실을 잇는 중일 때 { fromId, tempPathEl }
+let editingMemoId = null; // compose 패널이 "수정 모드"로 열려있을 때 대상 메모 id
 
 const boardWrap = document.getElementById('board-wrap');
 const board     = document.getElementById('board');
@@ -1608,18 +2069,14 @@ async function confirmDeleteLink(linkId) {
 }
 
 // ── 메모 생성 ──
-function makeMemo(m) {
-  if (memoMap[m.id]) return;
-  const el    = document.createElement('div');
-  const isOwn = ownMemoIds.has(m.id);
-  const tags  = Array.isArray(m.tags) ? m.tags : [];
+// 카드 내부(핀+메모지+태그+본문)를 만드는 부분만 따로 빼서, 새로 만들 때(makeMemo)와
+// 수정 후 다시 그릴 때(refreshMemoCard)가 같은 마크업을 재사용하게 함
+function memoCardInnerHtml(m, isOwn) {
+  const tags = Array.isArray(m.tags) ? m.tags : [];
   const tagsHtml = (tags.length || m.oneOnOne)
     ? `<div class="memo-tags">${tags.map(t => `<span class="memo-tag" title="${escHtml(CHARACTERS[t]?.ko || t)} · ${escHtml(CHARACTERS[t]?.en || '')}">${escHtml(tagAbbrev(t))}</span>`).join('')}${m.oneOnOne ? '<span class="memo-tag ooo-badge" title="원온원 One on One">⭐</span>' : ''}</div>`
     : '';
-  el.className  = 'memo-card';
-  el.dataset.id = m.id;
-  el.style.cssText = `width:${MEMO_W_SVG}px;left:${m.svgX-MEMO_W_SVG/2}px;top:${m.svgY-MEMO_H_SVG/2}px;transform:rotate(${m.angle}deg);z-index:${20+(memoOrder%30)};`;
-  el.innerHTML = `
+  return `
     <div class="memo-pin" style="background:${m.color}"></div>
     <div class="memo-paper${m.oneOnOne ? ' ooo' : ''}">
       ${isOwn ? '<button class="memo-del">×</button>' : ''}
@@ -1627,14 +2084,35 @@ function makeMemo(m) {
       <div class="memo-text">${escHtml(m.text)}</div>
       <div class="memo-author">${escHtml(m.author)}</div>
     </div>`;
+}
+
+function bindMemoCardChrome(el, m, isOwn) {
   if (isOwn) {
     el.querySelector('.memo-del').addEventListener('click', ev => { ev.stopPropagation(); deleteMemo(m.id); });
   }
-  makeDraggable(el, m, isOwn);
+  makeDraggable(el, m, isOwn); // innerHTML을 새로 그리면 기존 핀/메모지 리스너는 다 사라지니 매번 다시 붙여줌
+}
+
+function makeMemo(m) {
+  if (memoMap[m.id]) return;
+  const el    = document.createElement('div');
+  const isOwn = ownMemoIds.has(m.id);
+  el.className  = 'memo-card';
+  el.dataset.id = m.id;
+  el.style.cssText = `width:${MEMO_W_SVG}px;left:${m.svgX-MEMO_W_SVG/2}px;top:${m.svgY-MEMO_H_SVG/2}px;transform:rotate(${m.angle}deg);z-index:${20+(memoOrder%30)};`;
+  el.innerHTML = memoCardInnerHtml(m, isOwn);
+  bindMemoCardChrome(el, m, isOwn);
   memoLayer.appendChild(el);
   memoMap[m.id] = { m, el };
   memoOrder++;
   updateStrings();
+}
+
+// 텍스트/태그/원온원이 바뀐 뒤 카드를 다시 그림 (위치·색·작성자는 그대로 유지)
+function refreshMemoCard(entry) {
+  const isOwn = ownMemoIds.has(entry.m.id);
+  entry.el.innerHTML = memoCardInnerHtml(entry.m, isOwn);
+  bindMemoCardChrome(entry.el, entry.m, isOwn);
 }
 
 function escHtml(s) {
@@ -1769,22 +2247,28 @@ async function createLink(fromId, toId) {
 }
 
 // ── 수정 / 삭제 ──
+// 더블클릭/더블탭하면 새 메모 작성 때와 똑같은 입력 UI(텍스트+태그+원온원)를
+// 기존 값으로 채워서 다시 열어줌 — 텍스트만 고치는 게 아니라 태그도 다시 달 수 있게
 function startEdit(el, m) {
-  const textEl = el.querySelector('.memo-text');
-  if (textEl.querySelector('textarea')) return;
-  const orig = m.text;
-  textEl.innerHTML = '';
-  const ta = document.createElement('textarea');
-  ta.className = 'memo-edit-area';
-  ta.value = orig;
-  textEl.appendChild(ta);
-  ta.focus();
-  ta.addEventListener('blur', () => {
-    const newText = ta.value.trim() || orig;
-    m.text = newText;
-    textEl.innerHTML = escHtml(newText);
-    if (CONFIGURED) SB.update(m.id, { text: newText }).catch(() => toast('텍스트 저장 실패 — 동기화 시 이전 내용으로 돌아올 수 있어요'));
+  editingMemoId = m.id;
+  document.getElementById('compose-mode').textContent = '메모 수정';
+  document.getElementById('compose-text').value = m.text;
+  document.getElementById('c-submit').textContent = '수정 완료';
+  document.getElementById('compose').style.display = 'block';
+  document.getElementById('compose-text').focus();
+
+  resetComposePicker();
+  (m.tags || []).forEach(t => {
+    composeTags.add(t);
+    const chip = document.querySelector(`#tag-groups .tag-chip[data-tag="${t}"]`);
+    if (chip) {
+      chip.classList.add('selected');
+      const group = chip.closest('.tag-group');
+      if (group) group.classList.add('open');
+    }
   });
+  renderSelectedChips();
+  document.getElementById('ooo-check').checked = !!m.oneOnOne;
 }
 
 async function deleteMemo(id) {
@@ -1881,10 +2365,10 @@ async function syncAll() {
         // 다른 사람이 이동하거나 수정한 내용만 반영 (본인 메모는 건드리지 않음)
         const entry = memoMap[m.id];
         entry.m.svgX = m.svgX; entry.m.svgY = m.svgY; entry.m.text = m.text;
+        entry.m.tags = m.tags; entry.m.oneOnOne = m.oneOnOne;
         entry.el.style.left = (m.svgX - MEMO_W_SVG/2) + 'px';
         entry.el.style.top  = (m.svgY - MEMO_H_SVG/2) + 'px';
-        const textEl = entry.el.querySelector('.memo-text');
-        if (textEl && !textEl.querySelector('textarea')) textEl.innerHTML = escHtml(m.text);
+        refreshMemoCard(entry);
       }
     });
 
@@ -2105,18 +2589,48 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('compose').style.display = 'block';
     document.getElementById('compose-text').focus();
   };
-  document.getElementById('c-cancel').onclick = () => {
+  function closeCompose() {
     document.getElementById('compose').style.display = 'none';
     document.getElementById('compose-text').value    = '';
+    document.getElementById('compose-mode').textContent = '새 메모';
+    document.getElementById('c-submit').textContent     = '핀으로 꽂기';
+    editingMemoId = null;
     resetComposePicker();
-  };
+  }
+
+  document.getElementById('c-cancel').onclick = closeCompose;
   document.getElementById('c-submit').onclick = async () => {
     const text = document.getElementById('compose-text').value.trim();
     if (!text) return;
-    const pos      = randPos(Object.keys(memoMap).length);
-    const id       = (crypto.randomUUID?.() ?? (Date.now().toString(36) + Math.random().toString(36).slice(2)));
     const tags     = Array.from(composeTags);
     const oneOnOne = document.getElementById('ooo-check').checked;
+
+    if (editingMemoId) {
+      // ── 수정 모드: 기존 메모의 텍스트/태그/원온원만 갱신 (위치·색·작성자·핀은 그대로) ──
+      const entry = memoMap[editingMemoId];
+      const editedId = editingMemoId;
+      closeCompose();
+      if (!entry) return;
+      entry.m.text = text;
+      entry.m.tags = tags;
+      entry.m.oneOnOne = oneOnOne;
+      refreshMemoCard(entry);
+      if (CONFIGURED) {
+        try {
+          await SB.update(editedId, { text, tags, one_on_one: oneOnOne });
+          toast('메모가 수정됐어요!');
+        } catch (e) {
+          toast('수정 저장 실패 — 나중에 동기화해주세요');
+        }
+      } else {
+        toast('메모 수정됨 (공유 미설정)');
+      }
+      return;
+    }
+
+    // ── 신규 작성 ──
+    const pos = randPos(Object.keys(memoMap).length);
+    const id  = (crypto.randomUUID?.() ?? (Date.now().toString(36) + Math.random().toString(36).slice(2)));
     const m = {
       id, room: roomCode, author: user.nick, color: user.color, text,
       angle: randAngle(),
@@ -2127,9 +2641,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     ownMemoIds.add(id);
     makeMemo(m);
-    document.getElementById('compose').style.display = 'none';
-    document.getElementById('compose-text').value    = '';
-    resetComposePicker();
+    closeCompose();
     if (!timerStarted) startTimer(Date.now());
     if (CONFIGURED) {
       try {
@@ -2153,6 +2665,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('gallery-close').onclick = closeGallery;
   document.getElementById('gallery-back').onclick  = closeGalleryDetail;
   document.getElementById('gallery-save').onclick  = () => saveGalleryShot(galleryFilter, document.getElementById('gallery-title').textContent);
+
+  document.getElementById('export-btn').onclick = exportOfflineSnapshot;
+
+  const openHelp  = () => document.getElementById('help-overlay').style.display = 'flex';
+  const closeHelp = () => document.getElementById('help-overlay').style.display = 'none';
+  document.getElementById('help-btn-setup').onclick = openHelp;
+  document.getElementById('help-btn').onclick        = openHelp;
+  document.getElementById('help-close').onclick      = closeHelp;
 });
 </script>
 </body>
